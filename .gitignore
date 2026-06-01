@@ -1,0 +1,11 @@
+# Generated tool index + per-tool help/history caches.
+# Everything here is rebuilt by `blackarch-toolbox --refresh`, so it is
+# machine-specific state, never source.
+cache/
+*.log
+
+# Editor / OS noise
+*.swp
+*~
+.DS_Store
+Thumbs.db
