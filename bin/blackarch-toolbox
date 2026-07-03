@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# BlackArch Toolbox — command-line entry point.
+#
+# This is the single command everything routes through. With no arguments it
+# opens the launcher menu (which is what the Alt+A keybinding runs). The flags
+# cover the rest of the lifecycle so nothing needs a second script:
+#
+#   blackarch-toolbox            open the tool menu
+#   blackarch-toolbox --refresh  rebuild the tool index
+#   blackarch-toolbox --run BIN  open a tool's view directly, by name
+#   blackarch-toolbox --config    print resolved settings and paths
+#   blackarch-toolbox --version   show version
+#   blackarch-toolbox --help      this help
+
+set -uo pipefail
+
+SELF="$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+LIB="$SELF/../lib"
+# shellcheck source=/dev/null
+source "$LIB/paths.sh"
+# shellcheck source=/dev/null
+source "$LIB/ui.sh"
+
+VERSION="1.0.0"
+
+usage() {
+    cat <<EOF
+${BOLD}BlackArch Toolbox${RESET} ${STEEL}v$VERSION${RESET}
+A distro-agnostic launcher for the BlackArch security toolset.
+
+${EMBER}USAGE${RESET}
+  blackarch-toolbox [options]
+
+${EMBER}OPTIONS${RESET}
+  (no args)          open the two-level tool menu
+  -r, --refresh      rebuild the tool index for this machine
+  -R, --run BIN      open a specific tool's view by binary name
+  -c, --config       show the resolved configuration and paths
+  -l, --list         print every indexed tool (bin — package) to stdout
+  -v, --version      print the version
+  -h, --help         show this help
+
+${EMBER}CONFIGURATION${RESET}  (~/.config/blackarch-toolbox/config, or environment)
+  BAT_MENU=$BAT_MENU        menu program (auto|rofi|wofi|fuzzel|dmenu|fzf)
+  BAT_TERMINAL=$BAT_TERMINAL    terminal for CLI tools (auto|kitty|foot|…)
+  BAT_BACKEND=$BAT_BACKEND     package backend (auto|pacman|catalog)
+  BAT_GUI_MODE=$BAT_GUI_MODE     auto | always-terminal
+
+See docs/ADDING-TOOLS.md to add your own tools to the menu.
+EOF
+}
+
+case "${1:-}" in
+    ""|menu)         exec bash "$LIB/launcher.sh" ;;
+    -r|--refresh)    exec bash "$LIB/refresh.sh" ;;
+    -R|--run)
+        [[ -n "${2:-}" ]] || ui_die "usage: blackarch-toolbox --run <binary>"
+        # Find the package for this binary from the index, if we have one.
+        pkg=""
+        [[ -f "$BAT_CACHE/all.list" ]] && \
+            pkg="$(awk -F'\t' -v b="$2" '$1==b{print $2; exit}' "$BAT_CACHE/all.list")"
+        exec bash "$LIB/toolview.sh" "$2" "$pkg"
+        ;;
+    -l|--list)
+        [[ -f "$BAT_CACHE/all.list" ]] || ui_die "No index yet — run: blackarch-toolbox --refresh"
+        awk -F'\t' '{printf "%-28s %s\n", $1, $2}' "$BAT_CACHE/all.list"
+        ;;
+    -c|--config)
+        printf '%sBlackArch Toolbox%s v%s\n\n' "$BOLD" "$RESET" "$VERSION"
+        ui_kv "root"     "$BAT_ROOT"
+        ui_kv "cache"    "$BAT_CACHE"
+        ui_kv "config"   "$BAT_CONFIG"
+        ui_kv "menu"     "$BAT_MENU"
+        ui_kv "terminal" "$BAT_TERMINAL"
+        ui_kv "backend"  "$BAT_BACKEND"
+        ui_kv "gui-mode" "$BAT_GUI_MODE"
+        if [[ -f "$BAT_CACHE/backend" ]]; then
+            ui_kv "indexed" "$(wc -l < "$BAT_CACHE/all.list" 2>/dev/null || echo 0) tools via $(cat "$BAT_CACHE/backend")"
+        else
+            ui_kv "indexed" "not yet — run --refresh"
+        fi
+        ;;
+    -v|--version)    printf 'blackarch-toolbox %s\n' "$VERSION" ;;
+    -h|--help)       usage ;;
+    *)               ui_warn "unknown option: $1"; usage; exit 2 ;;
+esac
