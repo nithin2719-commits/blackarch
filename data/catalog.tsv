@@ -1,0 +1,365 @@
+# BlackArch Toolbox — distro-neutral tool catalogue
+#
+# Used by the `catalog` backend on every platform that lacks BlackArch's pacman
+# groups (Debian, Ubuntu, Kali, Parrot, Fedora, openSUSE, Alpine, macOS, WSL).
+# A row is shown in the menu only if its <binary> resolves on PATH, so it never
+# matters HOW the tool was installed (apt, dnf, pipx, go, cargo, a raw tarball)
+# — if it runs, it appears; if it isn't installed, it's silently skipped.
+#
+# Format (tab-separated):  <binary>\t<category>\t<one-line description>
+# Categories must match a token in data/sections.conf.
+#
+# This is a curated set of the tools people actually reach for, not an attempt
+# to mirror all 4000+ BlackArch packages. To add your own, append a line — see
+# docs/ADDING-TOOLS.md. Keep it sorted by category for readability.
+
+# ── recon ────────────────────────────────────────────────────────────────
+nmap	recon	Network exploration tool and security / port scanner
+masscan	recon	TCP port scanner, spews SYN packets asynchronously
+rustscan	recon	Modern fast port scanner that feeds nmap
+amass	recon	In-depth attack surface mapping and asset discovery
+subfinder	recon	Fast passive subdomain enumeration tool
+assetfinder	recon	Find domains and subdomains related to a domain
+findomain	recon	Fast cross-platform subdomain enumerator
+dnsx	recon	Fast and multi-purpose DNS toolkit
+dnsrecon	recon	DNS enumeration and reconnaissance script
+dnsenum	recon	Enumerate DNS information of a domain
+fierce	recon	DNS reconnaissance tool for locating non-contiguous IP space
+theharvester	recon	Gather emails, subdomains, hosts, and names from public sources
+recon-ng	recon	Full-featured web reconnaissance framework
+spiderfoot	recon	Automated OSINT collection and attack-surface monitoring
+shodan	recon	Command-line interface to the Shodan search engine
+waybackurls	recon	Fetch known URLs from the Wayback Machine for a host
+gau	recon	Get All URLs — fetch known URLs from multiple sources
+httpx	recon	Fast and multi-purpose HTTP toolkit / prober
+katana	recon	Next-generation crawling and spidering framework
+hakrawler	recon	Fast web crawler for gathering URLs and endpoints
+gospider	recon	Fast web spider written in Go
+whois	recon	Client for the WHOIS directory service
+dnstwist	recon	Domain-name permutation engine for detecting typosquatting
+sublist3r	recon	Fast subdomains enumeration using search engines
+knockpy	recon	Subdomain scanner via wordlist and DNS
+photon	recon	Fast crawler designed for OSINT
+metagoofil	fingerprint	Extract metadata from public documents of a target
+exiftool	fingerprint	Read and write meta information in files
+wafw00f	fingerprint	Identify and fingerprint web application firewalls
+whatweb	fingerprint	Next-generation web scanner / technology fingerprinter
+wappalyzer	fingerprint	Identify technologies used on websites
+
+# ── scanner ──────────────────────────────────────────────────────────────
+nuclei	scanner	Fast template-based vulnerability scanner
+nikto	scanner	Web server scanner for dangerous files and misconfigurations
+openvas	scanner	Open Vulnerability Assessment Scanner
+nessus	scanner	Vulnerability, configuration, and compliance scanner
+legion	scanner	Semi-automated network penetration testing framework
+sparta	scanner	Network infrastructure penetration testing GUI
+vuls	scanner	Agentless vulnerability scanner for Linux and FreeBSD
+trivy	scanner	Vulnerability scanner for containers and artifacts
+grype	scanner	Vulnerability scanner for container images and filesystems
+lynis	scanner	Security auditing and hardening tool for Unix systems
+testssl.sh	scanner	Check a server's TLS/SSL ciphers, protocols, and flaws
+sslscan	scanner	Query SSL/TLS services to determine supported ciphers
+sslyze	scanner	Fast and powerful SSL/TLS scanning library and CLI
+
+# ── webapp ───────────────────────────────────────────────────────────────
+sqlmap	webapp	Automatic SQL injection and database takeover tool
+gobuster	webapp	Directory, DNS, and vhost brute-forcer written in Go
+feroxbuster	webapp	Fast, recursive content discovery tool
+dirb	webapp	Web content scanner using a wordlist
+dirbuster	webapp	Multi-threaded web directory brute-forcer
+wpscan	webapp	WordPress security scanner
+joomscan	webapp	Joomla vulnerability scanner
+droopescan	webapp	Plugin-based scanner for Drupal, SilverStripe, and more
+commix	webapp	Automated command injection exploitation tool
+xsser	webapp	Automated framework to detect and exploit XSS
+dalfox	webapp	Fast, powerful XSS scanning and parameter analysis tool
+xsstrike	webapp	Advanced XSS detection suite
+arjun	webapp	HTTP parameter discovery suite
+paramspider	webapp	Mine parameters from web archives for a domain
+wfuzz	webapp	Web application fuzzer for brute-forcing
+burpsuite	webapp	Integrated platform for web application security testing
+zaproxy	webapp	OWASP Zed Attack Proxy — web app security scanner
+caido	webapp	Lightweight web security auditing toolkit
+whatweb	webapp	Next-generation web scanner / technology fingerprinter
+cmseek	webapp	CMS detection and exploitation suite
+nuclei	webapp	Fast template-based vulnerability scanner
+
+# ── fuzzer ───────────────────────────────────────────────────────────────
+ffuf	fuzzer	Fast web fuzzer written in Go
+wfuzz	fuzzer	Web application fuzzer for brute-forcing
+feroxbuster	fuzzer	Fast, recursive content discovery tool
+afl-fuzz	fuzzer	American Fuzzy Lop instrumentation-guided fuzzer
+honggfuzz	fuzzer	Security-oriented, feedback-driven fuzzer
+radamsa	fuzzer	General-purpose test-case mutator
+boofuzz	fuzzer	Network protocol fuzzing framework
+kitty	fuzzer	Fuzzing framework for building custom fuzzers
+
+# ── exploitation ─────────────────────────────────────────────────────────
+msfconsole	exploitation	Metasploit Framework console
+msfvenom	exploitation	Metasploit payload generator and encoder
+searchsploit	exploitation	Command-line search for Exploit-DB
+setoolkit	exploitation	Social-Engineer Toolkit
+beef	exploitation	Browser Exploitation Framework
+routersploit	exploitation	Exploitation framework for embedded devices
+empire	exploitation	PowerShell and Python post-exploitation framework
+sliver	exploitation	Adversary emulation / red-team C2 framework
+havoc	exploitation	Modern and malleable post-exploitation C2 framework
+villain	exploitation	Backdoor and reverse-shell management framework
+crackmapexec	exploitation	Swiss-army knife for pentesting networks
+netexec	exploitation	Network service exploitation tool (nxc), successor to CME
+
+# ── cracker ──────────────────────────────────────────────────────────────
+hashcat	cracker	Advanced GPU-based password recovery tool
+john	cracker	John the Ripper password cracker
+hydra	cracker	Fast network logon cracker supporting many protocols
+medusa	cracker	Speedy, parallel, modular login brute-forcer
+ncrack	cracker	High-speed network authentication cracking tool
+patator	cracker	Multi-purpose brute-forcer with a modular design
+crowbar	cracker	Brute-forcing tool for protocols nmap-nse can't reach
+hashid	cracker	Identify the type of a given hash
+hash-identifier	cracker	Identify different types of hashes
+name-that-hash	cracker	Modern hash identifier with hashcat/john modes
+
+# ── crypto ───────────────────────────────────────────────────────────────
+openssl	crypto	Cryptography toolkit for TLS, keys, and certificates
+gpg	crypto	GNU Privacy Guard encryption and signing
+hashdeep	crypto	Compute and audit hashsets of files recursively
+sops	crypto	Encrypt and manage secrets in config files
+age	crypto	Simple, modern file encryption tool
+featherduster	crypto	Automated, modular cryptanalysis tool
+rsactftool	crypto	Attack and recover weak RSA keys (CTF-oriented)
+cyberchef	crypto	The cyber Swiss-army knife for encoding and analysis
+
+# ── windows ──────────────────────────────────────────────────────────────
+impacket-secretsdump	windows	Dump SAM/LSA/NTDS secrets over the network (Impacket)
+impacket-psexec	windows	PSExec-style remote execution (Impacket)
+impacket-smbclient	windows	Interactive SMB client (Impacket)
+impacket-GetNPUsers	windows	AS-REP roasting via Kerberos (Impacket)
+impacket-GetUserSPNs	windows	Kerberoasting — request service tickets (Impacket)
+evil-winrm	windows	WinRM shell for pentesting Windows hosts
+bloodhound	windows	Active Directory attack-path analysis
+bloodhound-python	windows	Python ingestor for BloodHound
+certipy	windows	AD Certificate Services enumeration and abuse
+kerbrute	windows	Brute-force and enumerate Active Directory accounts
+responder	windows	LLMNR/NBT-NS/MDNS poisoner and rogue authentication server
+enum4linux	windows	Enumerate information from Windows and Samba systems
+enum4linux-ng	windows	Next-generation enum4linux rewrite
+smbmap	windows	Enumerate SMB shares and permissions across a network
+ldapsearch	windows	Query LDAP / Active Directory directory servers
+netexec	windows	Network service exploitation tool (nxc), successor to CME
+crackmapexec	windows	Swiss-army knife for pentesting Windows networks
+
+# ── backdoor ─────────────────────────────────────────────────────────────
+weevely	backdoor	Stealthy PHP web shell for post-exploitation
+msfvenom	backdoor	Metasploit payload generator and encoder
+villain	backdoor	Backdoor and reverse-shell session manager
+pupy	backdoor	Cross-platform remote administration and post-exploitation
+chisel	backdoor	Fast TCP/UDP tunnel over HTTP for pivoting
+ligolo-ng	backdoor	Reverse tunneling and pivoting tool
+
+# ── malware ──────────────────────────────────────────────────────────────
+yara	malware	Pattern-matching engine for malware identification
+clamscan	malware	ClamAV command-line virus scanner
+capa	malware	Detect capabilities in executable files
+floss	malware	Extract obfuscated strings from malware
+die	malware	Detect It Easy — file type and packer identifier
+
+# ── sniffer ──────────────────────────────────────────────────────────────
+wireshark	sniffer	Network protocol analyzer with a GUI
+tshark	sniffer	Terminal-based network protocol analyzer
+tcpdump	sniffer	Command-line packet analyzer
+ettercap	sniffer	Comprehensive suite for man-in-the-middle attacks
+bettercap	sniffer	Swiss-army knife for network attacks and monitoring
+dsniff	sniffer	Collection of tools for network auditing and sniffing
+ngrep	sniffer	Network grep — apply regexes to packet payloads
+netsniff-ng	sniffer	High-performance network sniffer and toolkit
+p0f	sniffer	Passive OS fingerprinting from captured traffic
+
+# ── proxy ────────────────────────────────────────────────────────────────
+mitmproxy	proxy	Interactive TLS-capable intercepting HTTP proxy
+mitmweb	proxy	Web interface for mitmproxy
+proxychains	proxy	Force any TCP connection through a proxy chain
+proxychains4	proxy	Force any TCP connection through a proxy chain
+socat	proxy	Multipurpose relay for bidirectional data transfer
+stunnel	proxy	TLS wrapper for arbitrary network services
+
+# ── wireless ─────────────────────────────────────────────────────────────
+aircrack-ng	wireless	Complete suite for auditing wireless networks
+airmon-ng	wireless	Enable monitor mode on wireless interfaces
+airodump-ng	wireless	Capture raw 802.11 frames and handshakes
+aireplay-ng	wireless	Inject and replay wireless frames
+wifite	wireless	Automated wireless attack tool
+kismet	wireless	Wireless network detector, sniffer, and IDS
+reaver	wireless	Brute-force attack against WPS PINs
+bully	wireless	Brute-force WPS implementation
+hcxdumptool	wireless	Capture packets from WLAN devices for hashcat
+hcxpcapngtool	wireless	Convert captures to hashcat/john formats
+fluxion	wireless	Wi-Fi social-engineering / evil-twin framework
+wifiphisher	wireless	Rogue access-point framework for red-team engagements
+
+# ── bluetooth ────────────────────────────────────────────────────────────
+bluetoothctl	bluetooth	Interactive Bluetooth control utility
+hcitool	bluetooth	Configure and query Bluetooth devices
+bettercap	bluetooth	BLE reconnaissance and attacks
+btscanner	bluetooth	Scan for and enumerate Bluetooth devices
+spooftooph	bluetooth	Spoof and clone Bluetooth device information
+
+# ── nfc ──────────────────────────────────────────────────────────────────
+nfc-list	nfc	List NFC targets in range (libnfc)
+mfoc	nfc	MIFARE Classic offline cracker
+mfcuk	nfc	MIFARE Classic universal toolkit / darkside attack
+proxmark3	nfc	Client for the Proxmark3 RFID research device
+
+# ── radio ────────────────────────────────────────────────────────────────
+rtl_433	radio	Decode ISM-band radio transmissions from an RTL-SDR
+gqrx	radio	Software-defined-radio receiver with a GUI
+gnuradio-companion	radio	Visual flowgraph tool for GNU Radio
+multimon-ng	radio	Decode digital radio transmission modes
+inspectrum	radio	Analyse captured signals from an SDR
+hackrf_transfer	radio	Send and receive samples with a HackRF
+
+# ── reversing ────────────────────────────────────────────────────────────
+ghidra	reversing	Software reverse-engineering suite from the NSA
+cutter	reversing	Reverse-engineering GUI powered by Rizin
+rizin	reversing	Reverse-engineering framework (radare2 fork)
+vivisect	reversing	Python binary analysis and disassembly framework
+redasm	reversing	Cross-platform interactive disassembler
+r2	disassembler	radare2 — command-line reverse-engineering framework
+radare2	disassembler	Command-line reverse-engineering framework
+objdump	disassembler	Display information from and disassemble object files
+gdb	debugger	The GNU debugger
+lldb	debugger	The LLVM debugger
+edb	debugger	Cross-platform x86/x86-64 debugger
+retdec-decompiler	decompiler	Retargetable machine-code decompiler
+jadx	decompiler	Decompile Android DEX/APK to Java source
+jadx-gui	decompiler	GUI for the jadx Android decompiler
+
+# ── binary ───────────────────────────────────────────────────────────────
+pwntools	binary	CTF framework and exploit-development library
+ropgadget	binary	Search for ROP gadgets in binaries
+ROPgadget	binary	Search for ROP gadgets in binaries
+ropper	binary	Display and search gadgets, build ROP chains
+one_gadget	binary	Find one-shot RCE gadgets in libc
+checksec	binary	Check the security properties of an executable
+readelf	binary	Display information about ELF files
+nm	binary	List symbols from object files
+strings	binary	Print the printable strings in a file
+patchelf	binary	Modify the dynamic linker and RPATH of ELF binaries
+upx	packer	Compress and pack executables
+
+# ── forensic ─────────────────────────────────────────────────────────────
+volatility	forensic	Advanced memory-forensics framework
+volatility3	forensic	Next-generation memory-forensics framework (vol)
+autopsy	forensic	Digital-forensics platform / GUI for The Sleuth Kit
+sleuthkit	forensic	Command-line digital-investigation tools
+binwalk	forensic	Firmware analysis and extraction tool
+foremost	forensic	Recover files based on headers and footers (carving)
+scalpel	forensic	Fast file carver
+bulk_extractor	forensic	Scan disk images for emails, URLs, and artifacts
+testdisk	forensic	Recover lost partitions and repair filesystems
+photorec	forensic	File-recovery / carving companion to TestDisk
+exiftool	forensic	Read and write meta information in files
+steghide	anti-forensic	Hide data in image and audio files (steganography)
+stegseek	anti-forensic	Fast steghide passphrase cracker
+zsteg	anti-forensic	Detect steganography in PNG and BMP files
+outguess	anti-forensic	Universal steganographic tool
+
+# ── defensive ────────────────────────────────────────────────────────────
+suricata	defensive	High-performance network IDS/IPS and monitoring engine
+zeek	defensive	Powerful network-analysis and security-monitoring framework
+snort	ids	Network intrusion detection and prevention system
+fail2ban-client	defensive	Ban hosts that show malicious signs from logs
+ossec-control	defensive	Host-based intrusion detection system control
+wazuh-control	defensive	Security monitoring and XDR platform control
+rkhunter	defensive	Rootkit, backdoor, and local-exploit scanner
+chkrootkit	defensive	Locally check for signs of a rootkit
+clamscan	defensive	ClamAV command-line virus scanner
+
+# ── social ───────────────────────────────────────────────────────────────
+sherlock	social	Hunt down social-media accounts by username
+maigret	social	Collect a dossier on a person by username
+holehe	social	Check if an email is used on different sites
+socialscan	social	Check email and username availability across sites
+osintgram	social	Interactive OSINT tool for Instagram
+twint	social	Advanced Twitter scraping / OSINT tool
+h8mail	social	Email OSINT and breach-hunting tool
+maltego	social	Interactive data-mining and link-analysis GUI
+spiderfoot	social	Automated OSINT collection tool
+
+# ── mobile ───────────────────────────────────────────────────────────────
+apktool	mobile	Reverse-engineer Android APK files
+jadx	mobile	Decompile Android DEX/APK to Java source
+mobsf	mobile	Mobile Security Framework — automated app analysis
+frida	mobile	Dynamic instrumentation toolkit for app research
+objection	mobile	Runtime mobile exploration powered by Frida
+adb	mobile	Android Debug Bridge — talk to Android devices
+scrcpy	mobile	Display and control Android devices over USB/TCP
+drozer	mobile	Android security assessment framework
+
+# ── networking ───────────────────────────────────────────────────────────
+netcat	networking	TCP/IP swiss-army knife (nc)
+nc	networking	TCP/IP swiss-army knife
+ncat	networking	Nmap's improved reimplementation of netcat
+socat	networking	Multipurpose relay for bidirectional data transfer
+hping3	networking	Command-line packet crafter and analyzer
+scapy	networking	Interactive packet-manipulation program and library
+netdiscover	networking	Active/passive ARP reconnaissance tool
+arp-scan	networking	Discover and fingerprint hosts on the local network
+fping	networking	Send ICMP echo probes to many hosts in parallel
+mtr	networking	Combined traceroute and ping network diagnostic
+iperf3	networking	Measure maximum achievable network bandwidth
+tcpreplay	networking	Replay captured network traffic
+
+# ── database ─────────────────────────────────────────────────────────────
+sqlmap	database	Automatic SQL injection and database takeover tool
+mongoaudit	database	Audit MongoDB deployments for misconfigurations
+nosqlmap	database	Automated NoSQL database enumeration and exploitation
+mysql	database	MySQL command-line client
+psql	database	PostgreSQL interactive terminal
+redis-cli	database	Redis command-line interface
+
+# ── code-audit ───────────────────────────────────────────────────────────
+semgrep	code-audit	Fast, static analysis for finding bugs and vulnerabilities
+bandit	code-audit	Find common security issues in Python code
+gitleaks	code-audit	Detect hardcoded secrets and keys in git repos
+trufflehog	code-audit	Find leaked credentials across git history and more
+brakeman	code-audit	Static analysis security scanner for Ruby on Rails
+graudit	code-audit	Grep-based source-code auditing tool
+retire	code-audit	Scanner for known-vulnerable JavaScript libraries
+safety	code-audit	Check Python dependencies for known vulnerabilities
+
+# ── automation ───────────────────────────────────────────────────────────
+sn0int	automation	Semi-automatic OSINT framework and package manager
+osmedeus	automation	Fully automated offensive-security reconnaissance framework
+reconftw	automation	Automated recon that chains dozens of tools
+sqlmap	automation	Automatic SQL injection and database takeover tool
+autorecon	automation	Multi-threaded network reconnaissance automation
+
+# ── honeypot ─────────────────────────────────────────────────────────────
+cowrie	honeypot	Medium-interaction SSH and Telnet honeypot
+honeyd	honeypot	Create virtual hosts on a network as decoys
+opencanary	honeypot	Multi-protocol honeypot for detecting intrusions
+pentbox	honeypot	Security suite that includes a simple honeypot
+
+# ── dos ──────────────────────────────────────────────────────────────────
+slowloris	dos	Low-bandwidth HTTP denial-of-service tool
+hping3	dos	Packet crafter usable for flood/DoS testing
+t50	dos	Fast multi-protocol packet injector / stress tester
+goldeneye	dos	HTTP/S layer-7 DoS testing tool
+
+# ── hardware ─────────────────────────────────────────────────────────────
+flashrom	hardware	Read, write, and erase flash chips (BIOS/firmware)
+openocd	hardware	On-chip debugging, in-system programming via JTAG
+minicom	hardware	Serial-console / modem communication program
+sigrok-cli	hardware	Logic-analyzer and signal-acquisition CLI
+esptool	firmware	Read, write, and flash Espressif ESP8266/ESP32 chips
+binwalk	firmware	Firmware analysis and extraction tool
+firmware-mod-kit	firmware	Extract and rebuild firmware images
+
+# ── misc ─────────────────────────────────────────────────────────────────
+cewl	misc	Generate custom wordlists by spidering a site
+crunch	misc	Generate wordlists from a character set and pattern
+seclists	misc	Collection of multiple types of security wordlists
+exploitdb	misc	Local copy of the Exploit Database
+tmux	misc	Terminal multiplexer for long-running engagements
+jq	misc	Command-line JSON processor
