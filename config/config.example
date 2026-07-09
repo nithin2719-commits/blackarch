@@ -1,0 +1,40 @@
+# BlackArch Toolbox — user configuration.
+#
+# Copy this to ~/.config/blackarch-toolbox/config and uncomment what you want
+# to change. Every setting can also be given as an environment variable for a
+# one-off run, e.g.:   BAT_MENU=fzf blackarch-toolbox
+#
+# This file is sourced as bash, so keep the KEY=value form.
+
+# ── menu program ──────────────────────────────────────────────────────────
+# auto  = rofi > fuzzel > wofi > dmenu on a desktop, fzf over SSH/TTY.
+# Force one if you prefer it, or if auto-detection picks the wrong one.
+#   auto | rofi | fuzzel | wofi | dmenu | fzf
+#BAT_MENU=auto
+
+# ── terminal for CLI tools ────────────────────────────────────────────────
+# The window a command-line tool opens into. kitty gives the richest view
+# (inline logo, themed background); the rest work fine too. 'inline' would run
+# in the current terminal — that is the automatic fallback over SSH.
+#   auto | kitty | alacritty | foot | wezterm | konsole | gnome-terminal | xterm
+#BAT_TERMINAL=auto
+
+# ── package backend ───────────────────────────────────────────────────────
+# auto    = pacman (BlackArch groups) on Arch, the bundled catalogue elsewhere.
+# pacman  = force the Arch/BlackArch path (4000+ tools).
+# catalog = force the distro-neutral catalogue + PATH scan (any OS).
+#   auto | pacman | catalog
+#BAT_BACKEND=auto
+
+# ── GUI handling ──────────────────────────────────────────────────────────
+# auto             = GUI tools open their own window; CLI tools open the
+#                    themed terminal view.
+# always-terminal  = never spawn a GUI; always open the terminal view (handy
+#                    on a headless box or when you want the usage screen first).
+#   auto | always-terminal
+#BAT_GUI_MODE=auto
+
+# ── paths (advanced) ──────────────────────────────────────────────────────
+# Where the generated index / help cache / per-tool history live. Defaults to
+# $XDG_CACHE_HOME/blackarch-toolbox. Point it elsewhere for a portable install.
+#BAT_CACHE="$HOME/.cache/blackarch-toolbox"
