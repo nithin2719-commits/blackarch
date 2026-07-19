@@ -1,0 +1,72 @@
+<svg width="1280" height="440" viewBox="0 0 1280 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#120809"/>
+      <stop offset="0.55" stop-color="#0a0607"/>
+      <stop offset="1" stop-color="#050304"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.36" r="0.62">
+      <stop offset="0" stop-color="#ff2b2b" stop-opacity="0.20"/>
+      <stop offset="0.5" stop-color="#ff2b2b" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ff2b2b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f0dcdc"/>
+    </linearGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff2b2b" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ff2b2b"/>
+      <stop offset="1" stop-color="#ff7a45" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="440" fill="url(#bg)"/>
+  <rect width="1280" height="440" fill="url(#glow)"/>
+
+  <!-- faint scanline grid, evokes the terminal without noise -->
+  <g stroke="#ff2b2b" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="110" x2="1280" y2="110"/>
+    <line x1="0" y1="220" x2="1280" y2="220"/>
+    <line x1="0" y1="330" x2="1280" y2="330"/>
+  </g>
+
+  <!-- BlackArch chevron mark -->
+  <g transform="translate(640 118)">
+    <path d="M 0 -52 L 46 40 L 24 40 L 0 -8 L -24 40 L -46 40 Z" fill="#ff2b2b"/>
+    <path d="M 0 -18 L 14 12 L 0 4 L -14 12 Z" fill="#ff7a45"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="640" y="248" text-anchor="middle"
+        font-family="JetBrainsMono Nerd Font, monospace" font-weight="700"
+        font-size="76" letter-spacing="6">
+    <tspan fill="url(#wm)">BLACK</tspan><tspan fill="#ff2b2b">ARCH</tspan>
+  </text>
+  <text x="640" y="300" text-anchor="middle"
+        font-family="JetBrainsMono Nerd Font, monospace" font-weight="500"
+        font-size="30" letter-spacing="20" fill="#9a7d7d">T O O L B O X</text>
+
+  <rect x="440" y="330" width="400" height="2" fill="url(#rule)"/>
+
+  <!-- tagline -->
+  <text x="640" y="372" text-anchor="middle"
+        font-family="JetBrainsMono Nerd Font, monospace" font-weight="400"
+        font-size="20" fill="#c8b6b6">One keybinding. Every BlackArch tool. Any distro.</text>
+
+  <!-- badges row -->
+  <g font-family="JetBrainsMono Nerd Font, monospace" font-size="15" font-weight="500">
+    <g transform="translate(386 398)">
+      <rect x="0" y="0" width="130" height="30" rx="15" fill="#160a0b" stroke="#3a1416"/>
+      <text x="65" y="20" text-anchor="middle" fill="#ff7a45">4000+ tools</text>
+    </g>
+    <g transform="translate(530 398)">
+      <rect x="0" y="0" width="196" height="30" rx="15" fill="#160a0b" stroke="#3a1416"/>
+      <text x="98" y="20" text-anchor="middle" fill="#ff7a45">Arch · Debian · Kali</text>
+    </g>
+    <g transform="translate(740 398)">
+      <rect x="0" y="0" width="164" height="30" rx="15" fill="#160a0b" stroke="#3a1416"/>
+      <text x="82" y="20" text-anchor="middle" fill="#ff7a45">Windows via WSL</text>
+    </g>
+  </g>
+</svg>
