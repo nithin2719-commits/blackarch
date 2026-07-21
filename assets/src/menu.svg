@@ -1,0 +1,65 @@
+<svg width="1000" height="720" viewBox="0 0 1000 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d0708"/>
+      <stop offset="1" stop-color="#070405"/>
+    </linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="26" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <rect width="1000" height="720" fill="url(#bg)"/>
+
+  <!-- window -->
+  <g filter="url(#sh)" transform="translate(190 44)">
+    <rect x="0" y="0" width="620" height="632" rx="14" fill="#0a0607" stroke="#ff2b2b" stroke-width="1.2"/>
+
+    <!-- brand / input bar -->
+    <rect x="0" y="0" width="620" height="76" rx="14" fill="#160a0b"/>
+    <rect x="0" y="62" width="620" height="14" fill="#160a0b"/>
+    <line x1="0" y1="76" x2="620" y2="76" stroke="#ff2b2b" stroke-width="1"/>
+    <g transform="translate(26 26)">
+      <path d="M 12 0 L 26 26 L 20 26 L 12 12 L 4 26 L -2 26 Z" fill="#ff2b2b"/>
+    </g>
+    <text x="66" y="46" font-family="JetBrainsMono Nerd Font, monospace" font-weight="700"
+          font-size="21" letter-spacing="1"><tspan fill="#f0e6e6">BLACK</tspan><tspan fill="#ff2b2b">ARCH</tspan></text>
+    <text x="596" y="46" text-anchor="end" font-family="JetBrainsMono Nerd Font, monospace"
+          font-size="15" fill="#5a4848">type to filter…</text>
+
+    <!-- status message -->
+    <rect x="0" y="76" width="620" height="34" fill="#0f0809"/>
+    <line x1="0" y1="110" x2="620" y2="110" stroke="#1e0e0f" stroke-width="1"/>
+    <text x="26" y="98" font-family="JetBrainsMono Nerd Font, monospace" font-size="14" xml:space="preserve"><tspan fill="#ff7a45" font-weight="700">4110</tspan><tspan fill="#5a4848"> runnable tools   ·   23:10</tspan></text>
+
+    <!-- rows -->
+    <g font-family="JetBrainsMono Nerd Font, monospace" font-size="16">
+      <!-- selected: Search all tools -->
+      <g transform="translate(14 124)">
+        <rect x="0" y="0" width="592" height="44" rx="7" fill="#23090b"/>
+        <rect x="0" y="0" width="3" height="44" rx="1.5" fill="#ff2b2b"/>
+        <rect x="20" y="16" width="12" height="12" rx="2" fill="#ff7a45"/>
+        <text x="44" y="28" fill="#f0e6e6" font-weight="700">Search all tools</text>
+        <text x="580" y="28" text-anchor="end" fill="#5a4848" font-size="13">every runnable tool</text>
+      </g>
+
+      <!-- section rows: marker, name, count -->
+      <g fill="#9a7d7d">
+        <g transform="translate(14 176)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Recon</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">633 tools</text></g>
+        <g transform="translate(14 216)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Scanner</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">955 tools</text></g>
+        <g transform="translate(14 256)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Web App</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">503 tools</text></g>
+        <g transform="translate(14 296)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Fuzzer</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">304 tools</text></g>
+        <g transform="translate(14 336)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Exploitation</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">508 tools</text></g>
+        <g transform="translate(14 376)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Cracker</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">338 tools</text></g>
+        <g transform="translate(14 416)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Passwords &amp; Crypto</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">167 tools</text></g>
+        <g transform="translate(14 456)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Windows &amp; AD</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">131 tools</text></g>
+        <g transform="translate(14 496)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Backdoor &amp; Post</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">165 tools</text></g>
+        <g transform="translate(14 536)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Sniffer &amp; MitM</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">281 tools</text></g>
+        <g transform="translate(14 576)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Wireless</text><text x="580" y="26" text-anchor="end" fill="#5a4848" font-size="14">178 tools</text></g>
+      </g>
+    </g>
+
+    <!-- scrollbar -->
+    <rect x="612" y="124" width="3" height="496" rx="1.5" fill="#0f0809"/>
+    <rect x="612" y="124" width="3" height="150" rx="1.5" fill="#ff2b2b"/>
+  </g>
+</svg>
