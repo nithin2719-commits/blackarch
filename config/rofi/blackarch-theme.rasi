@@ -56,16 +56,35 @@ inputbar {
     border-radius:    14px 14px 0px 0px;
     border:           0px 0px 1px 0px;
     border-color:     @blood;
-    padding:          16px 18px;
+    /* Kept tight: this bar is chrome, and every pixel it takes is a tool row
+       you cannot see. */
+    padding:          9px 16px;
     spacing:          14px;
     children:         [ "prompt", "entry" ];
 }
 
-/* The BlackArch lockup. The image scales to this width, so a larger width = a
-   bigger, more prominent logo/wordmark. */
+/* The BlackArch lockup, drawn as this widget's background image.
+ *
+ * rofi sizes the prompt widget from its TEXT, and ignores `width` here -- so
+ * the 420px below never applied and the 1374px lockup was being squeezed into
+ * roughly 97px. At that scale the thin red ARCH strokes lose more pixels than
+ * the solid white BLACK ones, which is why the two halves of the wordmark
+ * looked like different sizes.
+ *
+ * The prompt text is transparent, so its FONT SIZE is what actually drives the
+ * widget width -- and therefore how large the lockup renders. 22 gives a crisp
+ * wordmark with both halves visibly equal, while leaving the entry room to
+ * type in a 560px window. */
 prompt {
     expand:           false;
+    font:             "JetBrainsMono Nerd Font 15";
     width:            420px;
+    /* The lockup is drawn as a background image and centred in this widget's
+       box. At font 22 that box is taller than the entry beside it, so the image
+       centre sat ~4px below the "type to filter…" baseline. Padding the bottom
+       lifts the image by half that, putting the two optically on one line
+       (measured to 0px difference, not eyeballed). */
+    padding:          0px 0px 12px 0px;
     text-color:       transparent;
     background-color: transparent;
     background-image: url("@@BAT_ASSETS@@/brand_rofi.png", width);
@@ -86,7 +105,7 @@ message {
     background-color: @bg-alt;
     border:           0px 0px 1px 0px;
     border-color:     #21100f;
-    padding:          9px 22px;
+    padding:          6px 20px;
 }
 textbox {
     text-color: @fg-dim;
