@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # BlackArch Toolbox — launcher core.
 #
-# Two-level menu over an index of *runnable* tools (see refresh.sh):
-#   section  ->  tool  ->  launch
+# A search-first menu over an index of *runnable* tools (see refresh.sh):
+#   type a name -> launch      (the fast path: Alt+A, type, Enter)
+#   or browse a category -> tool -> launch
 #
 # Launch policy:
 #   - a tool with a GUI (.desktop entry or a binary that links a GUI toolkit)
@@ -24,6 +25,8 @@ source "$HERE/ui.sh"
 source "$HERE/menu.sh"
 # shellcheck source=/dev/null
 source "$HERE/terminal.sh"
+# shellcheck source=/dev/null
+source "$HERE/state.sh"
 
 PIDFILE="${TMPDIR:-/tmp}/blackarch-toolbox.pid"
 
@@ -150,77 +153,124 @@ launch_tool() {
     fi
 }
 
-# ---- section level -------------------------------------------------------
-# A clean top menu: a single "Search all tools" entry first (open it to
-# type-search the whole arsenal), then the section headers to browse. The full
-# tool list is never dumped into the top view -- it appears only inside the
-# search or a section, so the default view stays tidy.
-build_sections() {
-    SEC_PANGO=(); SEC_PLAIN=(); SEC_SLUG=()
-    local NAMEW=20 icon name slug count ename padded
-    SEC_PANGO+=("<span foreground='${EMBER}'></span>   <b>$(printf '%-*s' "$NAMEW" 'Search all tools')</b>  <span size='small' foreground='${FAINT}'>type any tool name  ›</span>")
-    SEC_PLAIN+=("$(printf '  %-*s  %s' "$NAMEW" 'Search all tools' 'type any tool name')")
-    SEC_SLUG+=("__search__")
-    while IFS=$'\t' read -r icon name slug count; do
-        padded="$(printf '%-*s' "$NAMEW" "$name")"
-        ename="$(printf '%s' "$padded" | pango_escape)"
-        SEC_PANGO+=("<span foreground='#ff2b2b'>${icon}</span>  <b>${ename}</b>  <span size='small' foreground='${FAINT}'>$(printf '%4s' "$count") tools  ›</span>")
-        SEC_PLAIN+=("$(printf '%s %-*s  %4s tools  >' "$icon" "$NAMEW" "$name" "$count")")
-        SEC_SLUG+=("$slug")
-    done < "$BAT_CACHE/sections.list"
+# ---- the menu ------------------------------------------------------------
+# One list, built in a single awk pass (see menu.awk): favorites, recents, the
+# 27 sections, then every remaining tool below the fold. The default view is
+# short; typing searches the whole arsenal, because the picker filters the
+# entire list rather than only what is on screen. That is what makes the fast
+# path Alt+A -> type -> Enter, with no intermediate "search" row to select.
+MENU_LIST="$BAT_CACHE/menu.list"      # the top view: ~30 rows, all destinations
+SEARCH_LIST="$BAT_CACHE/search.list"  # every tool, organised, one Enter away
+
+# $1 = 0 for the top view, 1 for the full search list; $2 = output file.
+build_menu() {
+    # awk aborts if an input file is missing, and on a fresh install neither the
+    # favorites nor the recents file exists yet -- which would leave the menu
+    # empty on first run. Make sure both are present (empty is fine).
+    touch "$BAT_FAVORITES" "$BAT_RECENT" 2>/dev/null
+    awk -f "$HERE/menu.awk" \
+        -v favfile="$BAT_FAVORITES" \
+        -v recfile="$BAT_RECENT" \
+        -v secfile="$BAT_CACHE/sections.list" \
+        -v reccap="$BAT_RECENT_MAX" -v withtools="$1" \
+        -v namew=20 -v blood='#ff2b2b' -v ember="$EMBER" -v faint="$FAINT" \
+        "$BAT_FAVORITES" "$BAT_RECENT" \
+        "$BAT_CACHE/sections.list" "$BAT_CACHE/all.list" > "$2"
 }
 
-# ---- tool level ----------------------------------------------------------
-# Section/all list rows are pre-rendered:  bin \t pkg \t pango \t plain
-# One pass, no per-row forks: the display columns are already escaped and
-# truncated by refresh.sh, so this is pure array loading. A single read over the
-# file beats four `cut` subprocesses, so even the 4000-row "search all" list
-# loads in well under a tenth of a second.
-build_tools() {  # $1 = list file
-    TOOL_PANGO=(); TOOL_PLAIN=(); TOOL_BIN=(); TOOL_PKG=()
-    local bin pkg pango plain
-    while IFS=$'\t' read -r bin pkg pango plain; do
-        [[ -z "$bin" ]] && continue
-        TOOL_BIN+=("$bin"); TOOL_PKG+=("$pkg")
-        TOOL_PANGO+=("$pango"); TOOL_PLAIN+=("$plain")
-    done < "$1"
-}
-
-# Kept to a single short line: the previous three-clause version wrapped inside
-# the compact menu and pushed the rows down.
+# The status strip is the only chrome, so it earns its line: how much there is
+# to search, and the one key that is not guessable. Nothing else.
 top_status() {
-    printf "<span foreground='%s'>%s tools · type to search</span>" \
-        "$EMBER" "$(wc -l < "$BAT_CACHE/all.list")"
+    local n; n="$(wc -l < "$BAT_CACHE/all.list" 2>/dev/null || echo 0)"
+    local hint=""
+    menu_has_fav_key && hint="  <span foreground='${FAINT}'>· ctrl+s star</span>"
+    printf "<span foreground='%s'>%s tools</span>  <span foreground='%s'>· enter to search</span>%s" \
+        "$EMBER" "${n// /}" "$FAINT" "$hint"
 }
 
-# Open a focused tool list (whole arsenal or one section) and launch the pick.
-pick_and_launch() {  # $1 = listfile  $2 = prompt  $3 = mesg
-    build_tools "$1"
-    local tidx; tidx="$(menu_pick "$2" "$3" TOOL_PLAIN TOOL_PANGO)"
-    [[ -z "$tidx" ]] && return 1
-    launch_tool "${TOOL_BIN[$tidx]}" "${TOOL_PKG[$tidx]}"
+search_status() {
+    local n; n="$(wc -l < "$BAT_CACHE/all.list" 2>/dev/null || echo 0)"
+    printf "<span foreground='%s'>all %s tools</span>  <span foreground='%s'>· type to search · esc back</span>" \
+        "$EMBER" "${n// /}" "$FAINT"
+}
+
+section_status() {  # $1 = section title
+    printf "<span foreground='%s'>%s</span>  <span foreground='%s'>· type to filter · esc back</span>" \
+        "$EMBER" "$(printf '%s' "$1" | pango_escape)" "$FAINT"
+}
+
+# Read one row out of a list file by index, into ROW_*.
+read_row() {  # $1 = file  $2 = index  $3.. = field names
+    local line; line="$(sed -n "$(( $2 + 1 ))p" "$1")"
+    [[ -z "$line" ]] && return 1
+    IFS=$'\t' read -r ROW_A ROW_B ROW_C _ <<< "$line"
+}
+
+# ---- section level -------------------------------------------------------
+# Browsing a category, or the full search list. Both are the same thing: a list
+# of tools you filter by typing. Same picker, same keys, same star toggle.
+pick_from_list() {  # $1 = listfile  $2 = status  $3 = pango col  $4 = plain col
+    local listfile="$1" status="$2" pcol="$3" tcol="$4" choice idx
+    while true; do
+        choice="$(menu_pick "$status" "$listfile" "$pcol" "$tcol")"
+        [[ -z "$choice" ]] && return 1              # esc -> back up one level
+        if [[ "$choice" == fav\ * ]]; then
+            idx="${choice#fav }"
+            read_row "$listfile" "$idx" || continue
+            # In the search list the binary is column 2; in a section list it is
+            # column 1. read_row hands back the first three either way.
+            if [[ "$ROW_A" == tool ]]; then toggle_favorite "$ROW_B"
+            else toggle_favorite "$ROW_A"; fi
+            continue                                 # stay put; starring is the point
+        fi
+        read_row "$listfile" "$choice" || return 1
+        if [[ "$ROW_A" == tool ]]; then
+            record_recent "$ROW_B"; launch_tool "$ROW_B" "$ROW_C"
+        else
+            record_recent "$ROW_A"; launch_tool "$ROW_A" "$ROW_B"
+        fi
+        return 0
+    done
+}
+
+browse_section() {  # $1 = slug
+    # Two statements on purpose: `local a=$1 b=${a}` does not work, because
+    # local declares every name (unset) before running any assignment, so the
+    # ${a} on the same line expands to nothing -- and dies under `set -u`.
+    local slug="$1"
+    local listfile="$BAT_CACHE/section_${slug}.list" title
+    [[ -f "$listfile" ]] || return 1
+    title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
+    pick_from_list "$listfile" "$(section_status "${title:-tools}")" 3 4
+}
+
+search_all() {
+    build_menu 1 "$SEARCH_LIST"
+    pick_from_list "$SEARCH_LIST" "$(search_status)" 4 5
 }
 
 # ---- main loop -----------------------------------------------------------
-# Two clean levels: the top shows "Search all tools" + the sections; picking
-# either opens a focused, type-to-filter list. The full tool list is never
-# dumped into the top view.
+# The top view is short and every row is a destination: search, the tools this
+# user actually uses, then the categories. Esc closes.
 while true; do
-    build_sections
-    idx="$(menu_pick "󰣇 BlackArch" "$(top_status)" SEC_PLAIN SEC_PANGO)"
-    [[ -z "$idx" ]] && break
-    slug="${SEC_SLUG[$idx]}"
+    build_menu 0 "$MENU_LIST"
+    choice="$(menu_pick "$(top_status)" "$MENU_LIST" 4 5)"
+    [[ -z "$choice" ]] && break                      # esc -> close the launcher
 
-    if [[ "$slug" == "__search__" ]]; then
-        pick_and_launch "$BAT_CACHE/all.list" "search all" \
-            "<span foreground='${EMBER}'>all tools</span>  <span foreground='${FAINT}'>· type a name · ESC back</span>" || continue
-        break
+    if [[ "$choice" == fav\ * ]]; then
+        idx="${choice#fav }"
+        read_row "$MENU_LIST" "$idx" || continue
+        [[ "$ROW_A" == tool ]] && toggle_favorite "$ROW_B"
+        continue                                     # reopen, restacked
     fi
 
-    listfile="$BAT_CACHE/section_${slug}.list"
-    [[ -f "$listfile" ]] || continue
-    title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
-    pick_and_launch "$listfile" "${title:-tools}" \
-        "<span foreground='${EMBER}'>$(printf '%s' "${title:-tools}" | pango_escape)</span>  <span foreground='${FAINT}'>· type to filter · ESC back</span>" || continue
-    break
+    read_row "$MENU_LIST" "$choice" || break
+    case "$ROW_A" in
+        search) search_all && break ;;               # launched from the list
+        sec)    browse_section "$ROW_B" && break ;;
+        tool)   record_recent "$ROW_B"
+                launch_tool "$ROW_B" "$ROW_C"
+                break ;;
+        *)      break ;;
+    esac
 done
