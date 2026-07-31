@@ -1,30 +1,28 @@
-/* BlackArch toolbox — rofi theme
+/* BlackArch Toolbox — rofi theme (v2, refined)
  *
- * Identity: red on near-black, but the neutrals are warmed toward the accent
- * (the greys carry a little red) so nothing reads as flat GTK grey. One accent
- * for structure, one brighter red for the active row; a warm ash for the dim
- * package names so they recede without disappearing.
- *
- * Wider than the old 260px so "binary  —  package" fits on one line, and the
- * active row gets a left accent bar instead of a full border, which stays put
- * regardless of glyph width.
+ * Red-on-near-black identity, but everything is given room to breathe: a taller
+ * brand bar, generous row padding, a clear active-row treatment (brighter fill,
+ * a solid accent bar, bright text), and a hairline inner structure so the menu
+ * reads as one deliberate surface instead of a cramped list. Neutrals are warmed
+ * toward the accent so nothing looks like flat GTK grey.
  */
 
 * {
-    blood:       #ff2b2b;
-    ember:       #ff7a45;
-    bg:          #0a0607;
-    bg-inputs:   #160a0b;
-    bg-alt:      #0f0809;
-    row-sel:     #23090b;
-    fg:          #f0e6e6;
-    fg-dim:      #9a7d7d;
-    fg-faint:    #5a4848;
+    blood:       #ff2b2b;   /* primary accent — border, active bar, counts   */
+    blood-soft:  #c81f22;
+    ember:       #ff7a45;   /* secondary — highlights, keys                  */
+    bg:          #0b0708;   /* window base                                   */
+    bg-inputs:   #17090a;   /* brand / input bar                             */
+    bg-alt:      #100a0b;   /* message strip, scrollbar trough               */
+    row-sel:     #2a0b0e;   /* active row fill                               */
+    fg:          #f4ecec;   /* bright body                                   */
+    fg-dim:      #b09a9a;   /* tool descriptions / package names             */
+    fg-faint:    #6a5555;   /* counts, hints                                 */
     transparent: rgba(0,0,0,0);
 
-    font:        "JetBrainsMono Nerd Font 11";
+    font:             "JetBrainsMono Nerd Font 11";
     background-color: transparent;
-    text-color:  @fg;
+    text-color:       @fg;
 }
 
 window {
@@ -32,17 +30,15 @@ window {
     background-color: @bg;
     border:           1px;
     border-color:     @blood;
-    border-radius:    12px;
-    width:            560px;   /* compact -- descriptions are kept short to fit */
+    border-radius:    16px;
+    width:            720px;
     padding:          0px;
 
-    /* Top-left corner. y-offset is ADDED on top of the waybar's reserved zone,
-       so keep it tiny -- the menu then sits flush in the corner just under the
-       bar (measured: waybar reserves ~32px, so 4px puts it right below). */
+    /* Flush to the top-left corner, just under the waybar. */
     location:         north west;
     anchor:           north west;
-    x-offset:         0px;
-    y-offset:         4px;
+    x-offset:         12px;
+    y-offset:         12px;
 }
 
 mainbox {
@@ -51,33 +47,25 @@ mainbox {
     padding:  0px;
 }
 
-/* Brand bar: the real BlackArch logo image shown ON the prompt widget (it
-   already owns a layout slot, so the listview keeps its height). The -p text
-   is hidden behind the image. */
+/* Brand bar: the BlackArch lockup sits on the prompt widget; the entry is the
+   live search field beside it. */
 inputbar {
     background-color: @bg-inputs;
-    border-radius:    12px 12px 0px 0px;
+    border-radius:    16px 16px 0px 0px;
     border:           0px 0px 1px 0px;
     border-color:     @blood;
-    padding:          14px 16px;
-    spacing:          12px;
+    padding:          18px 22px;
+    spacing:          16px;
     children:         [ "prompt", "entry" ];
 }
 
 prompt {
     expand:           false;
-    /* The brand image is the lockup CENTERED on a tall (3.4:1) transparent
-       canvas. With WIDTH-scaling the image is scaled to this slot and its height
-       comes out TALLER than the ~85px bar -- so rofi can't tile it (tiling only
-       happens when the image is shorter than the element), and width-scaling
-       means the wordmark never clips. The visible logo height is 95*width/687,
-       so 350px -> a medium ~48px logo that fits the bar cleanly. */
-    width:            350px;
-    text-color:       transparent;   /* hide -p text; the logo image shows */
+    width:            300px;
+    text-color:       transparent;
     background-color: transparent;
     background-image: url("@@BAT_ASSETS@@/brand_rofi.png", width);
-    font:       "JetBrainsMono Nerd Font Bold 13";
-    vertical-align: 0.5;
+    vertical-align:   0.5;
 }
 
 entry {
@@ -86,40 +74,41 @@ entry {
     placeholder-color: @fg-faint;
     vertical-align:    0.5;
     cursor:            text;
+    padding:           2px 0px;
 }
 
+/* Usage hint strip under the brand bar. */
 message {
     background-color: @bg-alt;
     border:           0px 0px 1px 0px;
-    border-color:     #1e0e0f;
-    padding:          6px 16px;
+    border-color:     #21100f;
+    padding:          9px 22px;
 }
-
 textbox {
-    text-color: @ember;
-    font:       "JetBrainsMono Nerd Font 9";
+    text-color: @fg-dim;
+    font:       "JetBrainsMono Nerd Font 10";
 }
 
 listview {
     background-color: transparent;
     columns:          1;
-    lines:            14;
-    spacing:          1px;
-    padding:          8px;
+    lines:            16;
+    spacing:          3px;
+    padding:          12px 10px;
     scrollbar:        true;
     fixed-height:     false;
     dynamic:          true;
 }
 
 scrollbar {
-    handle-color:     @blood;
-    handle-width:     3px;
+    handle-color:     @blood-soft;
+    handle-width:     4px;
     background-color: @bg-alt;
 }
 
 element {
-    padding:       9px 14px;
-    border-radius: 6px;
+    padding:       11px 16px;
+    border-radius: 9px;
     spacing:       12px;
     cursor:        pointer;
 }
@@ -130,13 +119,12 @@ element alternate.normal { background-color: transparent; text-color: @fg-dim; }
 element selected.normal {
     background-color: @row-sel;
     text-color:       @fg;
-    /* left accent bar: fixed-width, never shifts with glyph rendering */
     border:           0px 0px 0px 3px;
     border-color:     @blood;
 }
 
 element-icon {
-    size:             0px;   /* icons come from the text glyph, not GTK icons */
+    size:             0px;
     background-color: transparent;
 }
 
@@ -144,5 +132,5 @@ element-text {
     background-color: transparent;
     text-color:       inherit;
     vertical-align:   0.5;
-    highlight:        bold #ff7a45;   /* fuzzy-match highlight in ember */
+    highlight:        bold #ff7a45;   /* live fuzzy-match highlight */
 }
