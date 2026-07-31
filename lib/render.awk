@@ -15,7 +15,14 @@ function esc(s) {
     return s
 }
 
-BEGIN { FS = OFS = "\t"; if (namew == "") namew = 24 }
+BEGIN {
+    FS = OFS = "\t"
+    if (namew == "") namew = 24
+    # Build the pad format instead of using sprintf("%-*s", namew, s): busybox
+    # awk rejects star-widths outright ("%*x formats are not supported"), which
+    # broke indexing on Alpine and anywhere else the only awk is busybox.
+    padfmt = "%-" namew "s"
+}
 {
     bin = $1; pkg = $2; desc = $3
     # Short + precise: keep descriptions to ~30 chars so a padded name plus its
@@ -26,7 +33,7 @@ BEGIN { FS = OFS = "\t"; if (namew == "") namew = 24 }
     # Both columns pad the name to a fixed width, so every description starts
     # at the same x and the list reads as two columns rather than a ragged
     # dump. The menu font is monospace, so the padding lines up exactly.
-    name = sprintf("%-*s", namew, bin)
+    name = sprintf(padfmt, bin)
 
     pango = "<b>" esc(name) "</b>"
     if (length(desc) > 0)
