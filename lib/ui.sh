@@ -61,5 +61,18 @@ ui_cmd() {
 }
 
 ui_note() { printf "  %s%s%s\n" "$ASH" "$1" "$RESET"; }
+
+# A short, transient confirmation for an action taken from the menu (starring a
+# tool, launching one). Goes to the desktop when there is one and to stderr when
+# there is not, so the same call works under Hyprland and over SSH. Silent if
+# neither is available -- feedback is never worth failing a launch over.
+ui_notify() {
+    if command -v notify-send >/dev/null 2>&1 && [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]]; then
+        notify-send -t 1200 "BlackArch Toolbox" "$1" 2>/dev/null &
+        disown 2>/dev/null || true
+    else
+        printf "  %s%s%s\n" "$EMBER" "$1" "$RESET" >&2
+    fi
+}
 ui_warn() { printf "  %s%s%s\n" "$EMBER" "$1" "$RESET" >&2; }
 ui_die()  { printf "  %s%s%s\n" "$BLOOD" "$1" "$RESET" >&2; exit "${2:-1}"; }

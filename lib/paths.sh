@@ -28,7 +28,16 @@ BAT_CACHE="${BAT_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/blackarch-toolbox}"
 BAT_CONFIG_DIR="${BAT_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/blackarch-toolbox}"
 BAT_CONFIG="$BAT_CONFIG_DIR/config"
 
-mkdir -p "$BAT_CACHE" "$BAT_CONFIG_DIR" 2>/dev/null || true
+# Favorites are curated by hand and worth keeping (and worth being able to edit
+# in a text editor, or carry between machines), so they live with the config.
+# Recents are derived, churn on every launch, and losing them costs nothing --
+# so they are state, not config, and never pollute the config directory.
+BAT_STATE="${BAT_STATE:-${XDG_STATE_HOME:-$HOME/.local/state}/blackarch-toolbox}"
+BAT_FAVORITES="$BAT_CONFIG_DIR/favorites"
+BAT_RECENT="$BAT_STATE/recent"
+BAT_RECENT_MAX="${BAT_RECENT_MAX:-8}"   # how many recents the top view shows
+
+mkdir -p "$BAT_CACHE" "$BAT_CONFIG_DIR" "$BAT_STATE" 2>/dev/null || true
 
 # ---- user settings -------------------------------------------------------
 # Defaults first, then the user's config file overrides them. Every one of
