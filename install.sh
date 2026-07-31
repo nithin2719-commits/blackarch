@@ -85,11 +85,15 @@ keybind_hyprland() {
     local f="$HOME/.config/hypr/keybindings.conf"
     [[ -f "$f" ]] || f="$HOME/.config/hypr/hyprland.conf"
     if ((DO_UNINSTALL)); then kb_block_del "$f"; step "Hyprland binding removed"; return; fi
-    # Alongside the binding, make the tool view open FULL. It prints the tool's
-    # description, synopsis and whole flag list before handing over the shell,
-    # and a small tile wraps every one of those lines. The terminal's own
-    # "start maximized" flag is not enough under a tiling layout -- it just
+    # Alongside the binding, make the tool view fill the workspace. It prints
+    # the tool's description, synopsis and whole flag list before handing over
+    # the shell, and a small tile wraps every one of those lines. The terminal's
+    # own "start maximized" flag is not enough under a tiling layout -- it just
     # becomes another tile -- so the compositor has to do it.
+    #
+    # `maximize`, NOT `fullscreen`: fullscreen covers the whole output including
+    # the status bar. maximize fills the usable area instead, so waybar (or
+    # whatever bar is running) stays visible.
     #
     # The rule grammar changed in 0.55: `<rule> <value>, match:<field> <value>`.
     # Older releases only understand `windowrulev2 = <rule>, class:^(...)$`, and
@@ -99,22 +103,24 @@ keybind_hyprland() {
     ver="$(hyprctl version 2>/dev/null | grep -oP 'Hyprland \K[0-9]+\.[0-9]+' | head -1)"
     major="${ver%%.*}"; minor="${ver#*.}"
     if [[ -n "$ver" ]] && { (( major > 0 )) || (( minor >= 55 )); }; then
-        rule="windowrule = fullscreen true, match:class blackarch-toolview"
+        rule="windowrule = maximize true, match:class blackarch-toolview"
     else
-        rule="windowrulev2 = fullscreen, class:^(blackarch-toolview)\$"
+        rule="windowrulev2 = maximize, class:^(blackarch-toolview)\$"
     fi
     kb_block_add "$f" "bind = $MOD, $KEY, exec, $LINK
 $rule"
-    step "Hyprland: $MOD+$KEY -> toolbox, tool view opens full  ($f)"
+    step "Hyprland: $MOD+$KEY -> toolbox, tool view fills the workspace  ($f)"
     command -v hyprctl >/dev/null 2>&1 && hyprctl reload >/dev/null 2>&1 || true
 }
 
 keybind_sway() {
     local f="$HOME/.config/sway/config"
     if ((DO_UNINSTALL)); then kb_block_del "$f"; step "sway binding removed"; return; fi
-    kb_block_add "$f" "bindsym Mod1+${KEY,,} exec $LINK
-for_window [app_id=\"blackarch-toolview\"] fullscreen enable"
-    step "sway: Mod1+${KEY,,} -> toolbox, tool view opens full"
+    # No fullscreen rule here: sway's fullscreen covers the status bar, which is
+    # not wanted, and it has no "maximize". A tiled tool view already respects
+    # the bar; use the WM's own fullscreen key if you want it edge to edge.
+    kb_block_add "$f" "bindsym Mod1+${KEY,,} exec $LINK"
+    step "sway: Mod1+${KEY,,} -> toolbox"
     command -v swaymsg >/dev/null 2>&1 && swaymsg reload >/dev/null 2>&1 || true
 }
 
