@@ -64,8 +64,17 @@ _menu_rofi() {
     # -matching normal (substring), NOT fuzzy: fuzzy scatters the query letters
     # across the row and matched "mentalist" for "metasploit". Substring keeps
     # "metasp" to the metasploit family and nothing else.
+    #
+    # The prompt widget is where the BlackArch lockup lives: the theme paints it
+    # as that widget's background-image scaled to the widget's WIDTH, and rofi
+    # sizes the widget from its prompt TEXT -- which the theme renders
+    # transparent. So the prompt string, invisible as it is, silently decided how
+    # big the logo came out ("Recon" halved it, "search all" stretched it). Hand
+    # rofi one constant prompt so the brand renders identically at every level;
+    # the caller's label rides in the message strip, where it can be read. Only
+    # this backend needs it -- the others draw the prompt as real text.
     local args=(-dmenu -i -matching normal -markup-rows -format i
-        -theme "$theme" -lines 14 -p "$prompt")
+        -theme "$theme" -lines 14 -p '󰣇 BlackArch')
     [[ -f "$icon" ]] && args+=(-window-icon "$icon")
     [[ -n "$mesg" ]] && args+=(-mesg "$mesg")
     printf '%s\n' "${_rows[@]}" | rofi "${args[@]}"

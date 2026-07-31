@@ -212,13 +212,15 @@ while true; do
     slug="${SEC_SLUG[$idx]}"
 
     if [[ "$slug" == "__search__" ]]; then
-        pick_and_launch "$BAT_CACHE/all.list" "󰣇 search all" "type a tool name · ESC back" || continue
+        pick_and_launch "$BAT_CACHE/all.list" "search all" \
+            "<span foreground='${EMBER}'>all tools</span>  <span foreground='${FAINT}'>· type a name · ESC back</span>" || continue
         break
     fi
 
     listfile="$BAT_CACHE/section_${slug}.list"
     [[ -f "$listfile" ]] || continue
     title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
-    pick_and_launch "$listfile" "󰣇 ${title:-tools}" "ESC · back to menu" || continue
+    pick_and_launch "$listfile" "${title:-tools}" \
+        "<span foreground='${EMBER}'>$(printf '%s' "${title:-tools}" | pango_escape)</span>  <span foreground='${FAINT}'>· type to filter · ESC back</span>" || continue
     break
 done
