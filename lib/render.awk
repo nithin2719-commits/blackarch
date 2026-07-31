@@ -18,18 +18,21 @@ function esc(s) {
 BEGIN { FS = OFS = "\t"; if (namew == "") namew = 24 }
 {
     bin = $1; pkg = $2; desc = $3
-    # Short + precise: keep descriptions to ~36 chars so they fit the compact
-    # menu without the window edge clipping them.
+    # Short + precise: keep descriptions to ~30 chars so a padded name plus its
+    # description still fits the compact menu without being clipped.
     d = desc
-    if (length(d) > 38) d = substr(d, 1, 36) "…"
+    if (length(d) > 32) d = substr(d, 1, 30) "…"
 
-    pango = "<b>" esc(bin) "</b>"
+    # Both columns pad the name to a fixed width, so every description starts
+    # at the same x and the list reads as two columns rather than a ragged
+    # dump. The menu font is monospace, so the padding lines up exactly.
+    name = sprintf("%-*s", namew, bin)
+
+    pango = "<b>" esc(name) "</b>"
     if (length(desc) > 0)
-        pango = pango "   <span foreground='#9a7d7d'>" esc(d) "</span>"
+        pango = pango "  <span foreground='#9a7d7d'>" esc(d) "</span>"
 
-    # Plain rows pad the name to a fixed column so the descriptions line up as
-    # a second column -- markup-less menus have no other way to get alignment.
-    plain = sprintf("%-*s", namew, bin)
+    plain = name
     if (length(desc) > 0) plain = plain "  " d
 
     print bin, pkg, pango, plain
