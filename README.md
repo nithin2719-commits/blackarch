@@ -17,16 +17,20 @@
 
 BlackArch ships thousands of security tools, but finding and remembering how to
 run them is its own job. **BlackArch Toolbox** turns the whole arsenal into a
-single keystroke: press **`Alt`+`A`**, pick a category, pick a tool, and it
-opens — a GUI tool in its own window, a command-line tool in a themed terminal
-that shows you exactly how to run it first.
+single keystroke: press **`Alt`+`A`**, then either type a tool's name or pick a
+category and drill in. Whatever you choose opens — a GUI tool in its own window,
+a command-line tool in a themed terminal that shows you exactly how to run it
+first.
 
 <div align="center">
 
-| The menu | The per-tool view |
-|:---:|:---:|
-| ![menu](assets/menu.png) | ![tool view](assets/toolview.png) |
-| Sections ordered like a real engagement | Usage, flags & a scoped shell, per tool |
+![menu](assets/menu.png)
+
+*Level 1: one search entry + 27 sections. Level 2: the tools, filtered as you type.*
+
+![tool view](assets/toolview.png)
+
+*The per-tool view: usage, flags and a shell scoped to that tool.*
 
 </div>
 
@@ -41,9 +45,9 @@ catalogue against your `PATH`, so a tool shows up no matter how you installed it
 
 - **⌨️  One keybinding, everywhere** — `Alt`+`A` on Hyprland, sway, i3, GNOME,
   and Windows; a menu in any terminal over SSH.
-- **🧭  Two-level menu** — 27 sections ordered like an engagement
-  (recon → scan → exploit → escalate → specialist benches), or search every
-  tool at once.
+- **🧭  Two-level menu** — level 1 is a search entry plus 27 sections ordered
+  like an engagement (recon → scan → exploit → escalate → specialist benches);
+  level 2 is the tools themselves, filtered as you type.
 - **✅  Only runnable tools** — every entry is an executable that exists on your
   machine right now. No dead menu rows.
 - **📖  Never a blank prompt** — CLI tools open into a screen with their
@@ -142,6 +146,22 @@ Full steps: **[docs/INSTALL.md ▸ Windows](docs/INSTALL.md#windows-wsl)**.
 ---
 
 ## Usage
+
+The menu has exactly two levels, and the top one stays short on purpose — the
+arsenal is never dumped into the default view.
+
+**Level 1** — a single **Search all tools** entry, then the 27 sections with
+their tool counts. One line of status above them: how many tools are indexed,
+and the reminder that typing filters.
+
+**Level 2** — the list you drilled into, either the whole arsenal or one
+section. Type to filter, `Enter` launches, `Esc` goes back up. Each row is the
+tool name padded to a fixed column with its description beside it, so the
+descriptions line up as a second column rather than a ragged dump.
+
+Filtering is **substring** matching, not fuzzy: typing `metasp` gives you the
+metasploit family and nothing else. (Fuzzy matching scatters the query letters
+across the row, which is how `metasploit` used to return `mentalist`.)
 
 | Action | How |
 |--------|-----|
@@ -299,8 +319,11 @@ BAT_MENU=fzf blackarch-toolbox        # e.g. force the terminal menu over SSH
 - The index and every per-tool help/history file live under
   `~/.cache/blackarch-toolbox`, never in the repo, so one system-wide install
   serves multiple users.
-- The launcher does **zero per-tool work at click time** — every menu row is
-  pre-rendered at index time, so opening even a 900-tool section is instant.
+- The launcher does **zero per-tool work at click time** — every menu row,
+  including its pango markup and its padded name column, is pre-rendered by
+  `lib/render.awk` at index time, so opening even a 900-tool section is instant.
+- Picking a row returns its **index**, never its text, so the pretty display
+  column stays fully decoupled from the binary that actually gets launched.
 
 ---
 
