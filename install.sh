@@ -85,19 +85,36 @@ keybind_hyprland() {
     local f="$HOME/.config/hypr/keybindings.conf"
     [[ -f "$f" ]] || f="$HOME/.config/hypr/hyprland.conf"
     if ((DO_UNINSTALL)); then kb_block_del "$f"; step "Hyprland binding removed"; return; fi
-    # Only the binding: the tool view is meant to open as a full window (it
-    # prints the tool's usage and full flag list before handing over the shell,
-    # and that needs the width), so no float/size rule is written.
-    kb_block_add "$f" "bind = $MOD, $KEY, exec, $LINK"
-    step "Hyprland: $MOD+$KEY -> toolbox  ($f)"
+    # Alongside the binding, make the tool view open FULL. It prints the tool's
+    # description, synopsis and whole flag list before handing over the shell,
+    # and a small tile wraps every one of those lines. The terminal's own
+    # "start maximized" flag is not enough under a tiling layout -- it just
+    # becomes another tile -- so the compositor has to do it.
+    #
+    # The rule grammar changed in 0.55: `<rule> <value>, match:<field> <value>`.
+    # Older releases only understand `windowrulev2 = <rule>, class:^(...)$`, and
+    # each rejects the other's spelling outright -- so emit the one this
+    # Hyprland can actually parse rather than leaving a config error behind.
+    local rule ver major minor
+    ver="$(hyprctl version 2>/dev/null | grep -oP 'Hyprland \K[0-9]+\.[0-9]+' | head -1)"
+    major="${ver%%.*}"; minor="${ver#*.}"
+    if [[ -n "$ver" ]] && { (( major > 0 )) || (( minor >= 55 )); }; then
+        rule="windowrule = fullscreen true, match:class blackarch-toolview"
+    else
+        rule="windowrulev2 = fullscreen, class:^(blackarch-toolview)\$"
+    fi
+    kb_block_add "$f" "bind = $MOD, $KEY, exec, $LINK
+$rule"
+    step "Hyprland: $MOD+$KEY -> toolbox, tool view opens full  ($f)"
     command -v hyprctl >/dev/null 2>&1 && hyprctl reload >/dev/null 2>&1 || true
 }
 
 keybind_sway() {
     local f="$HOME/.config/sway/config"
     if ((DO_UNINSTALL)); then kb_block_del "$f"; step "sway binding removed"; return; fi
-    kb_block_add "$f" "bindsym Mod1+${KEY,,} exec $LINK"
-    step "sway: Mod1+${KEY,,} -> toolbox"
+    kb_block_add "$f" "bindsym Mod1+${KEY,,} exec $LINK
+for_window [app_id=\"blackarch-toolview\"] fullscreen enable"
+    step "sway: Mod1+${KEY,,} -> toolbox, tool view opens full"
     command -v swaymsg >/dev/null 2>&1 && swaymsg reload >/dev/null 2>&1 || true
 }
 

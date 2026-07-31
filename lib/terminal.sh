@@ -40,9 +40,11 @@ term_run() {
         kitty)
             # Full window on purpose: the tool view prints the tool's usage and
             # full flag list before handing over the shell, and that needs the
-            # width. --class gives the compositor a stable handle for per-window
-            # rules; --directory puts the shell in $HOME so a tool's output
-            # lands somewhere sane rather than in the launcher's own directory.
+            # width. --class is what the compositor's fullscreen rule matches on
+            # (the installer writes it) -- under a tiling WM --start-as maximized
+            # alone only makes this another tile. --directory puts the shell in
+            # $HOME so a tool's output lands somewhere sane rather than in the
+            # launcher's own directory.
             setsid kitty --config "$kitty_conf" --title "$title" \
                 --class blackarch-toolview --directory "$HOME" \
                 --start-as maximized -e "$@" >/dev/null 2>&1 &
