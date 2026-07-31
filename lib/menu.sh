@@ -61,7 +61,10 @@ _menu_rofi() {
     # rofi runs as its normal layer surface so it slides in via Hyprland's layer
     # animation and the theme draws its red frame. (-normal-window is avoided: it
     # yields an unmanaged override-redirect window with no rules/animation.)
-    local args=(-dmenu -i -matching fuzzy -no-sort -markup-rows -format i
+    # -matching normal (substring), NOT fuzzy: fuzzy scatters the query letters
+    # across the row and matched "mentalist" for "metasploit". Substring keeps
+    # "metasp" to the metasploit family and nothing else.
+    local args=(-dmenu -i -matching normal -markup-rows -format i
         -theme "$theme" -lines 14 -p "$prompt")
     [[ -f "$icon" ]] && args+=(-window-icon "$icon")
     [[ -n "$mesg" ]] && args+=(-mesg "$mesg")
