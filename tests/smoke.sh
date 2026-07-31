@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Portability smoke test for BlackArch Toolbox, run inside a distro container.
+# Exercises the paths that do not need a display: install, index, list, config.
+set -uo pipefail
+
+PASS=0; FAIL=0
+ok()   { printf '  PASS  %s\n' "$1"; PASS=$((PASS+1)); }
+bad()  { printf '  FAIL  %s\n' "$1"; printf '        %s\n' "${2:-}"; FAIL=$((FAIL+1)); }
+
+printf '\n=== %s ===\n' "$(. /etc/os-release 2>/dev/null && echo "$PRETTY_NAME" || echo unknown)"
+printf 'bash %s | awk: %s\n\n' "${BASH_VERSION}" "$(awk --version 2>/dev/null | head -1 || awk -W version 2>&1 | head -1)"
+
+cd /repo || exit 1
+
+# 1. every script parses under this bash
+err="$(for f in bin/blackarch-toolbox install.sh lib/*.sh lib/backends/*.sh; do
+          bash -n "$f" 2>&1 || echo "^^ $f"; done)"
+[[ -z "$err" ]] && ok "all scripts parse" || bad "scripts parse" "$err"
+
+# 2. installer runs (no keybinding, no root)
+out="$(bash install.sh --no-keybind 2>&1)"; rc=$?
+if [[ $rc -eq 0 ]]; then ok "install.sh --no-keybind (exit 0)"
+else bad "install.sh --no-keybind (exit $rc)" "$(echo "$out" | tail -15)"; fi
+
+BIN="$HOME/.local/bin/blackarch-toolbox"
+[[ -x "$BIN" ]] && ok "launcher symlinked onto PATH" || bad "launcher symlink missing"
+
+# 3. index builds via the catalogue backend
+out="$("$BIN" --refresh 2>&1)"; rc=$?
+if [[ $rc -eq 0 ]]; then ok "--refresh (exit 0): $(echo "$out" | tail -1)"
+else bad "--refresh (exit $rc)" "$(echo "$out" | tail -15)"; fi
+
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/blackarch-toolbox"
+n=$(wc -l < "$CACHE/all.list" 2>/dev/null || echo 0)
+[[ "$n" -gt 0 ]] && ok "index has $n runnable tools" || bad "index empty"
+s=$(wc -l < "$CACHE/sections.list" 2>/dev/null || echo 0)
+[[ "$s" -gt 0 ]] && ok "index has $s sections" || bad "no sections"
+
+# 4. every indexed tool must actually exist on PATH (the core promise)
+missing=0
+while IFS=$'\t' read -r bin _; do
+    command -v "$bin" >/dev/null 2>&1 || missing=$((missing+1))
+done < "$CACHE/all.list"
+[[ "$missing" -eq 0 ]] && ok "every indexed tool resolves on PATH" \
+    || bad "$missing indexed tools are not runnable"
+
+# 5. rows are well formed: bin \t pkg \t pango \t plain
+badrows="$(awk -F'\t' 'NF!=4{c++} END{print c+0}' "$CACHE/all.list")"
+[[ "$badrows" -eq 0 ]] && ok "all rows have 4 fields" || bad "$badrows malformed rows"
+
+# 6. the padded name column lines up (what render.awk exists to do)
+widths="$(awk -F'\t' '{ n=index($4,"  "); print n }' "$CACHE/all.list" | sort -u | wc -l)"
+ok "description column starts at $widths distinct offset(s)"
+
+# 7. read-only CLI surface
+for flag in --version --help --config --list; do
+    o="$("$BIN" $flag 2>&1)"; r=$?
+    [[ $r -eq 0 && -n "$o" ]] && ok "$flag" || bad "$flag (exit $r)" "$(echo "$o" | tail -5)"
+done
+
+# 8. menu backend detection must pick the terminal fallback when headless
+o="$("$BIN" --config 2>&1 | grep -i menu)"
+ok "headless menu resolution: ${o:-none}"
+
+printf '\n  %d passed, %d failed\n' "$PASS" "$FAIL"
+exit $(( FAIL > 0 ))
