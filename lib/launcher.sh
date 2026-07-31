@@ -151,20 +151,21 @@ launch_tool() {
 }
 
 # ---- section level -------------------------------------------------------
+# Builds the section header rows only. NSEC records how many there are, so the
+# combined top menu (sections followed by every tool) can tell a section pick
+# apart from a tool pick by index.
+NSEC=0
 build_sections() {
     SEC_PANGO=(); SEC_PLAIN=(); SEC_SLUG=()
-    local NAMEW=20
-    SEC_PANGO+=("<span foreground='${EMBER}'>󰝉</span>  <b>$(printf '%-*s' "$NAMEW" 'Search all tools')</b>  <span size='small' foreground='${FAINT}'>every runnable tool</span>")
-    SEC_PLAIN+=("$(printf '  %-*s  %s' "$NAMEW" 'Search all tools' 'every runnable tool')")
-    SEC_SLUG+=("__search__")
-    local icon name slug count ename padded
+    local NAMEW=20 icon name slug count ename padded
     while IFS=$'\t' read -r icon name slug count; do
         padded="$(printf '%-*s' "$NAMEW" "$name")"
         ename="$(printf '%s' "$padded" | pango_escape)"
-        SEC_PANGO+=("<span foreground='#ff2b2b'>${icon}</span>  <b>${ename}</b>  <span size='small' foreground='${FAINT}'>$(printf '%4s' "$count") tools</span>")
-        SEC_PLAIN+=("$(printf '%s %-*s  %4s tools' "$icon" "$NAMEW" "$name" "$count")")
+        SEC_PANGO+=("<span foreground='#ff2b2b'>${icon}</span>  <b>${ename}</b>  <span size='small' foreground='${FAINT}'>$(printf '%4s' "$count") tools  ›</span>")
+        SEC_PLAIN+=("$(printf '%s %-*s  %4s tools  >' "$icon" "$NAMEW" "$name" "$count")")
         SEC_SLUG+=("$slug")
     done < "$BAT_CACHE/sections.list"
+    NSEC=${#SEC_SLUG[@]}
 }
 
 # ---- tool level ----------------------------------------------------------
@@ -185,32 +186,41 @@ build_tools() {  # $1 = list file
 
 top_status() {
     local n; n="$(wc -l < "$BAT_CACHE/all.list" 2>/dev/null)"
-    printf "<span foreground='%s'><b>%s</b> runnable tools</span>  <span foreground='%s'>·  %s</span>" \
-        "$EMBER" "${n:-0}" "$FAINT" "$(date '+%H:%M')"
+    printf "<span foreground='%s'>type a tool name to search</span>  <span foreground='%s'>·</span>  <span foreground='%s'>pick a section to browse</span>  <span foreground='%s'>·  <b>%s</b> tools</span>" \
+        "$BONE" "$FAINT" "$DIM" "$FAINT" "${n:-0}"
+}
+
+# Drill into a section: list its tools and launch the pick.
+open_section() {  # $1 = slug
+    local slug="$1" listfile title tidx
+    listfile="$BAT_CACHE/section_${slug}.list"
+    [[ -f "$listfile" ]] || return 1
+    build_tools "$listfile"
+    title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
+    tidx="$(menu_pick "󰣇 ${title:-tools}" "ESC · back" TOOL_PLAIN TOOL_PANGO)"
+    [[ -z "$tidx" ]] && return 1
+    launch_tool "${TOOL_BIN[$tidx]}" "${TOOL_PKG[$tidx]}"
 }
 
 # ---- main loop -----------------------------------------------------------
+# One combined top menu: the section headers first (to browse), then every tool
+# (so the single search box matches any tool by name -- no "search all" detour).
+# A pick with index < NSEC is a section to drill into; anything past that is the
+# (idx-NSEC)-th tool.
 while true; do
     build_sections
-    idx="$(menu_pick "󰣇 BlackArch" "$(top_status)" SEC_PLAIN SEC_PANGO)"
-    [[ -z "$idx" ]] && break
-    slug="${SEC_SLUG[$idx]}"
+    build_tools "$BAT_CACHE/all.list"
+    MENU_PANGO=( "${SEC_PANGO[@]}" "${TOOL_PANGO[@]}" )
+    MENU_PLAIN=( "${SEC_PLAIN[@]}" "${TOOL_PLAIN[@]}" )
 
-    if [[ "$slug" == "__search__" ]]; then
-        build_tools "$BAT_CACHE/all.list"
-        tidx="$(menu_pick "󰣇 search" "" TOOL_PLAIN TOOL_PANGO)"
-        [[ -z "$tidx" ]] && continue
-        launch_tool "${TOOL_BIN[$tidx]}" "${TOOL_PKG[$tidx]}"
+    idx="$(menu_pick "󰣇 BlackArch" "$(top_status)" MENU_PLAIN MENU_PANGO)"
+    [[ -z "$idx" ]] && break
+
+    if ((idx < NSEC)); then
+        open_section "${SEC_SLUG[$idx]}" || continue
         break
     fi
-
-    listfile="$BAT_CACHE/section_${slug}.list"
-    [[ -f "$listfile" ]] || continue
-    build_tools "$listfile"
-
-    title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
-    tidx="$(menu_pick "󰣇 ${title:-tools}" "ESC · back to sections" TOOL_PLAIN TOOL_PANGO)"
-    [[ -z "$tidx" ]] && continue
-    launch_tool "${TOOL_BIN[$tidx]}" "${TOOL_PKG[$tidx]}"
+    t=$((idx - NSEC))
+    launch_tool "${TOOL_BIN[$t]}" "${TOOL_PKG[$t]}"
     break
 done
