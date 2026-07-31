@@ -47,8 +47,8 @@ catalogue against your `PATH`, so a tool shows up no matter how you installed it
   and Windows; a menu in any terminal over SSH.
 - **🔎  Search-first** — the first row is **Search all tools**: one `Enter`
   into every indexed tool, filtered as you type.
-- **⭐  Favorites & recents** — starred tools and your last-used ones sit at the
-  top of the default view. `Ctrl`+`S` stars whatever is highlighted.
+- **⭐  Favorites & recents** — each its own folder in the main box, next to
+  the categories. `Ctrl`+`S` stars whatever is highlighted, anywhere.
 - **🧭  Categories when you need them** — 27 sections ordered like an engagement
   (recon → scan → exploit → escalate → specialist benches), for when you don't
   know the tool's name.
@@ -154,19 +154,20 @@ Full steps: **[docs/INSTALL.md ▸ Windows](docs/INSTALL.md#windows-wsl)**.
 The fast path is **`Alt`+`A`, `Enter`, type** — the search list is the first
 row, so it opens on the keystroke you were already pressing.
 
-The top view is short on purpose — every row is a destination, and the
-4000-tool list is not poured into it:
+The main box holds **destinations, never tools** — so it is the same short
+shape whether you have starred two tools or fifty:
 
 ```
-  🔍 Search all tools       one Enter into the full, organised list
-  ★  starred tools          the ones you reach for on purpose
-  ↻  recent tools           the ones you reached for last
-     27 categories          for when you don't know the name
+  🔍 Search all tools   4181 tools ›    every indexed tool, one Enter away
+  ★  Favorites             2 tools ›    appears once you star something
+  ↻  Recent                3 tools ›    appears once you launch something
+     Recon                640 tools ›
+     Scanner              962 tools ›   …27 categories
 ```
 
-`Enter` on **Search all tools** opens every indexed tool as one list you filter
-by typing. Starred and recent tools are lifted to the top of it and removed from
-the body, so no list ever offers the same tool twice.
+Every row opens a list of tools you filter by typing. **Favorites** and
+**Recent** are folders exactly like the categories, and are hidden entirely
+while empty — a row that opens nothing has no business being there.
 
 **Don't know the name?** Pick a category and browse it — same picker, same keys.
 `Esc` goes back up, `Esc` again closes.

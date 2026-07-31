@@ -69,37 +69,47 @@ ok "description column starts at $widths distinct offset(s)"
 ) && ok "favorites star/unstar, recents order + dedupe" \
   || bad "favorites/recents state"
 
-# 8. the search-first menu: one list, correct order, no duplicates
+# 8. the menu: a main box of destinations, and the folders it opens
 (
   fav="$(mktemp)"; rec="$(mktemp)"; out="$(mktemp)"
   first="$(head -1 "$CACHE/all.list" | cut -f1)"
   printf '%s\n' "$first" > "$fav"
-  printf '%s\n' "$first" > "$rec"          # also recent: must NOT appear twice
+  printf '%s\n' "$first" > "$rec"
   build() { awk -f lib/menu.awk -v favfile="$fav" -v recfile="$rec" \
-      -v secfile="$CACHE/sections.list" -v reccap=8 -v namew=20 -v withtools="$1" \
+      -v secfile="$CACHE/sections.list" -v reccap=8 -v namew=20 -v mode="$1" \
       -v blood='#ff2b2b' -v ember='#ff7a45' -v faint='#5a4848' \
       "$fav" "$rec" "$CACHE/sections.list" "$CACHE/all.list"; }
   tools=$(wc -l < "$CACHE/all.list"); secs=$(wc -l < "$CACHE/sections.list")
 
-  # top view: search row + the one favorite + every section. NOT the tool list.
-  build 0 > "$out"
+  # main box: search + favorites + recent + every section. NO tool rows at all.
+  build top > "$out"
   rows=$(wc -l < "$out")
-  [[ "$rows" -eq $((1 + 1 + secs)) ]] || { echo "top rows $rows != $((2+secs))"; exit 1; }
-  [[ "$(head -1 "$out" | cut -f1)" == search ]] || { echo "search row not first"; exit 1; }
-  awk -F'\t' 'NR>1 && $1=="tool" && $2!=b {exit 1}' b="$first" "$out" \
-      || { echo "top view leaked the tool list"; exit 1; }
+  [[ "$rows" -eq $((3 + secs)) ]] || { echo "top rows $rows != $((3+secs))"; exit 1; }
+  [[ "$(cut -f1 "$out" | head -3 | tr '\n' ' ')" == "search favs recent " ]] \
+      || { echo "main box order wrong: $(cut -f1 "$out" | head -3 | tr '\n' ' ')"; exit 1; }
+  [[ -z "$(awk -F'\t' '$1=="tool"{print}' "$out")" ]] \
+      || { echo "main box leaked tool rows"; exit 1; }
 
-  # search list: every tool, no sections, no search row
-  build 1 > "$out"
-  rows=$(wc -l < "$out")
-  [[ "$rows" -eq "$tools" ]] || { echo "search rows $rows != $tools"; exit 1; }
-  [[ -z "$(awk -F'\t' '$1!="tool"{print}' "$out")" ]] || { echo "non-tool in search list"; exit 1; }
-  [[ "$(head -1 "$out" | cut -f2)" == "$first" ]] || { echo "favorite not first"; exit 1; }
-  # awk, not grep: "\t" is not a tab in grep's BRE, it is a literal "t".
-  n=$(awk -F'\t' -v b="$first" '$1=="tool" && $2==b {c++} END{print c+0}' "$out")
+  # an empty favorites file must not produce an empty folder row
+  : > "$fav"; : > "$rec"
+  build top > "$out"
+  [[ "$(wc -l < "$out")" -eq $((1 + secs)) ]] || { echo "empty folders not hidden"; exit 1; }
+  printf '%s\n' "$first" > "$fav"; printf '%s\n' "$first" > "$rec"
+
+  # each folder holds only tools
+  for m in all favs recent; do
+    build "$m" > "$out"
+    [[ -s "$out" ]] || { echo "$m list empty"; exit 1; }
+    [[ -z "$(awk -F'\t' '$1!="tool"{print}' "$out")" ]] || { echo "$m has non-tool rows"; exit 1; }
+  done
+
+  # the search list is every tool, in index order, exactly once each
+  build all > "$out"
+  [[ "$(wc -l < "$out")" -eq "$tools" ]] || { echo "search list != all tools"; exit 1; }
+  n=$(awk -F'\t' -v b="$first" '$2==b{c++} END{print c+0}' "$out")
   [[ "$n" -eq 1 ]] || { echo "row for $first appears $n times, want 1"; exit 1; }
   exit 0
-) && ok "menu: short top view, full search list, no duplicates" \
+) && ok "menu: main box of destinations, folders hold only tools" \
   || bad "menu list build"
 
 # 9. read-only CLI surface

@@ -159,10 +159,10 @@ launch_tool() {
 # short; typing searches the whole arsenal, because the picker filters the
 # entire list rather than only what is on screen. That is what makes the fast
 # path Alt+A -> type -> Enter, with no intermediate "search" row to select.
-MENU_LIST="$BAT_CACHE/menu.list"      # the top view: ~30 rows, all destinations
-SEARCH_LIST="$BAT_CACHE/search.list"  # every tool, organised, one Enter away
+MENU_LIST="$BAT_CACHE/menu.list"      # the main box: destinations only
+LIST_FILE="$BAT_CACHE/list.list"      # whichever folder was opened
 
-# $1 = 0 for the top view, 1 for the full search list; $2 = output file.
+# $1 = mode (top | all | favs | recent); $2 = output file.
 build_menu() {
     # awk aborts if an input file is missing, and on a fresh install neither the
     # favorites nor the recents file exists yet -- which would leave the menu
@@ -172,7 +172,7 @@ build_menu() {
         -v favfile="$BAT_FAVORITES" \
         -v recfile="$BAT_RECENT" \
         -v secfile="$BAT_CACHE/sections.list" \
-        -v reccap="$BAT_RECENT_MAX" -v withtools="$1" \
+        -v reccap="$BAT_RECENT_MAX" -v mode="$1" \
         -v namew=20 -v blood='#ff2b2b' -v ember="$EMBER" -v faint="$FAINT" \
         "$BAT_FAVORITES" "$BAT_RECENT" \
         "$BAT_CACHE/sections.list" "$BAT_CACHE/all.list" > "$2"
@@ -184,14 +184,17 @@ top_status() {
     local n; n="$(wc -l < "$BAT_CACHE/all.list" 2>/dev/null || echo 0)"
     local hint=""
     menu_has_fav_key && hint="  <span foreground='${FAINT}'>· ctrl+s star</span>"
-    printf "<span foreground='%s'>%s tools</span>  <span foreground='%s'>· enter to search</span>%s" \
+    printf "<span foreground='%s'>%s tools</span>  <span foreground='%s'>· enter to open</span>%s" \
         "$EMBER" "${n// /}" "$FAINT" "$hint"
 }
 
-search_status() {
-    local n; n="$(wc -l < "$BAT_CACHE/all.list" 2>/dev/null || echo 0)"
-    printf "<span foreground='%s'>all %s tools</span>  <span foreground='%s'>· type to search · esc back</span>" \
-        "$EMBER" "${n// /}" "$FAINT"
+# One status line shape for every opened folder: what you are looking at, then
+# the two keys that work there.
+list_status() {  # $1 = label
+    local hint=""
+    menu_has_fav_key && hint=" · ctrl+s star"
+    printf "<span foreground='%s'>%s</span>  <span foreground='%s'>· type to filter%s · esc back</span>" \
+        "$EMBER" "$(printf '%s' "$1" | pango_escape)" "$FAINT" "$hint"
 }
 
 section_status() {  # $1 = section title
@@ -206,31 +209,34 @@ read_row() {  # $1 = file  $2 = index  $3.. = field names
     IFS=$'\t' read -r ROW_A ROW_B ROW_C _ <<< "$line"
 }
 
-# ---- section level -------------------------------------------------------
-# Browsing a category, or the full search list. Both are the same thing: a list
-# of tools you filter by typing. Same picker, same keys, same star toggle.
+# ---- opening a folder ----------------------------------------------------
+# Every folder -- search, favorites, recent, a category -- is the same thing: a
+# list of tools you filter by typing. Same picker, same keys, same star toggle.
 pick_from_list() {  # $1 = listfile  $2 = status  $3 = pango col  $4 = plain col
-    local listfile="$1" status="$2" pcol="$3" tcol="$4" choice idx
+    local listfile="$1" status="$2" pcol="$3" tcol="$4" choice idx bin pkg
+    [[ -s "$listfile" ]] || return 1
     while true; do
         choice="$(menu_pick "$status" "$listfile" "$pcol" "$tcol")"
-        [[ -z "$choice" ]] && return 1              # esc -> back up one level
+        [[ -z "$choice" ]] && return 1              # esc -> back to the main box
+        idx="${choice#fav }"
+        read_row "$listfile" "$idx" || return 1
+        # Generated lists carry a kind column, so the binary is field 2; the
+        # section lists written by refresh.sh start with the binary itself.
+        if [[ "$ROW_A" == tool ]]; then bin="$ROW_B"; pkg="$ROW_C"
+        else bin="$ROW_A"; pkg="$ROW_B"; fi
         if [[ "$choice" == fav\ * ]]; then
-            idx="${choice#fav }"
-            read_row "$listfile" "$idx" || continue
-            # In the search list the binary is column 2; in a section list it is
-            # column 1. read_row hands back the first three either way.
-            if [[ "$ROW_A" == tool ]]; then toggle_favorite "$ROW_B"
-            else toggle_favorite "$ROW_A"; fi
+            toggle_favorite "$bin"
             continue                                 # stay put; starring is the point
         fi
-        read_row "$listfile" "$choice" || return 1
-        if [[ "$ROW_A" == tool ]]; then
-            record_recent "$ROW_B"; launch_tool "$ROW_B" "$ROW_C"
-        else
-            record_recent "$ROW_A"; launch_tool "$ROW_A" "$ROW_B"
-        fi
+        record_recent "$bin"
+        launch_tool "$bin" "$pkg"
         return 0
     done
+}
+
+open_generated() {  # $1 = mode  $2 = label
+    build_menu "$1" "$LIST_FILE"
+    pick_from_list "$LIST_FILE" "$(list_status "$2")" 4 5
 }
 
 browse_section() {  # $1 = slug
@@ -241,36 +247,25 @@ browse_section() {  # $1 = slug
     local listfile="$BAT_CACHE/section_${slug}.list" title
     [[ -f "$listfile" ]] || return 1
     title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
-    pick_from_list "$listfile" "$(section_status "${title:-tools}")" 3 4
-}
-
-search_all() {
-    build_menu 1 "$SEARCH_LIST"
-    pick_from_list "$SEARCH_LIST" "$(search_status)" 4 5
+    pick_from_list "$listfile" "$(list_status "${title:-tools}")" 3 4
 }
 
 # ---- main loop -----------------------------------------------------------
-# The top view is short and every row is a destination: search, the tools this
-# user actually uses, then the categories. Esc closes.
+# The main box holds destinations and nothing else: search, the folders this
+# user has earned (favorites, recent), then the categories. Esc closes.
 while true; do
-    build_menu 0 "$MENU_LIST"
+    build_menu top "$MENU_LIST"
     choice="$(menu_pick "$(top_status)" "$MENU_LIST" 4 5)"
     [[ -z "$choice" ]] && break                      # esc -> close the launcher
-
-    if [[ "$choice" == fav\ * ]]; then
-        idx="${choice#fav }"
-        read_row "$MENU_LIST" "$idx" || continue
-        [[ "$ROW_A" == tool ]] && toggle_favorite "$ROW_B"
-        continue                                     # reopen, restacked
-    fi
+    # Starring is meaningless on a folder row; ignore the key here.
+    [[ "$choice" == fav\ * ]] && continue
 
     read_row "$MENU_LIST" "$choice" || break
     case "$ROW_A" in
-        search) search_all && break ;;               # launched from the list
-        sec)    browse_section "$ROW_B" && break ;;
-        tool)   record_recent "$ROW_B"
-                launch_tool "$ROW_B" "$ROW_C"
-                break ;;
+        search) open_generated all    "all tools"  && break ;;
+        favs)   open_generated favs   "Favorites"  && break ;;
+        recent) open_generated recent "Recent"     && break ;;
+        sec)    browse_section "$ROW_B"            && break ;;
         *)      break ;;
     esac
 done

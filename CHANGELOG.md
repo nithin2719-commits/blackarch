@@ -63,10 +63,13 @@ Search, favorites and recents — the launcher gets a front door.
 ### Added
 - **Search all tools** is the first row of the menu: one `Enter` opens every
   indexed tool as a single organised list you filter by typing.
-- **Favorites** — `Ctrl`+`S` stars the highlighted tool. Starred tools sit at
-  the top of the menu and of the search list.
-- **Recently used** — the last few launched tools appear under the favorites,
-  automatically. No configuration, no counters.
+- **Favorites** — `Ctrl`+`S` stars the highlighted tool, in any list. Starred
+  tools get their own **Favorites** folder in the main box.
+- **Recently used** — a **Recent** folder, filled automatically by launching
+  things. No configuration, no counters.
+
+  Both are folders rather than inline rows, so the main box keeps the same
+  short shape however many tools get starred, and both are hidden while empty.
 - `tests/smoke.sh` and `tests/run-distros.sh`: the whole non-graphical surface,
   run in containers on Arch, Debian, Ubuntu, Fedora and Alpine.
 
