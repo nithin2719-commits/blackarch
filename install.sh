@@ -85,6 +85,9 @@ keybind_hyprland() {
     local f="$HOME/.config/hypr/keybindings.conf"
     [[ -f "$f" ]] || f="$HOME/.config/hypr/hyprland.conf"
     if ((DO_UNINSTALL)); then kb_block_del "$f"; step "Hyprland binding removed"; return; fi
+    # Only the binding: the tool view is meant to open as a full window (it
+    # prints the tool's usage and full flag list before handing over the shell,
+    # and that needs the width), so no float/size rule is written.
     kb_block_add "$f" "bind = $MOD, $KEY, exec, $LINK"
     step "Hyprland: $MOD+$KEY -> toolbox  ($f)"
     command -v hyprctl >/dev/null 2>&1 && hyprctl reload >/dev/null 2>&1 || true

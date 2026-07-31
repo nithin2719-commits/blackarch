@@ -38,15 +38,24 @@ term_run() {
 
     case "$TERM_BACKEND" in
         kitty)
+            # Full window on purpose: the tool view prints the tool's usage and
+            # full flag list before handing over the shell, and that needs the
+            # width. --class gives the compositor a stable handle for per-window
+            # rules; --directory puts the shell in $HOME so a tool's output
+            # lands somewhere sane rather than in the launcher's own directory.
             setsid kitty --config "$kitty_conf" --title "$title" \
+                --class blackarch-toolview --directory "$HOME" \
                 --start-as maximized -e "$@" >/dev/null 2>&1 &
             ;;
         alacritty)
-            setsid alacritty --title "$title" -e "$@" >/dev/null 2>&1 & ;;
+            setsid alacritty --class blackarch-toolview --title "$title" \
+                --working-directory "$HOME" -e "$@" >/dev/null 2>&1 & ;;
         foot)
-            setsid foot --title "$title" -- "$@" >/dev/null 2>&1 & ;;
+            setsid foot --app-id blackarch-toolview --title "$title" \
+                -- "$@" >/dev/null 2>&1 & ;;
         wezterm)
-            setsid wezterm start --class BlackArch -- "$@" >/dev/null 2>&1 & ;;
+            setsid wezterm start --class blackarch-toolview --cwd "$HOME" \
+                -- "$@" >/dev/null 2>&1 & ;;
         konsole)
             setsid konsole --title "$title" -e "$@" >/dev/null 2>&1 & ;;
         gnome-terminal)
