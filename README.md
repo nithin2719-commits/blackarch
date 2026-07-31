@@ -24,11 +24,11 @@ first.
 
 <div align="center">
 
-![menu](assets/menu.png)
+| Level 1 — search entry + sections | Level 2 — the tools, filtered as you type |
+|:---:|:---:|
+| <img src="assets/menu.png" width="420"> | <img src="assets/menu-tools.png" width="420"> |
 
-*Level 1: one search entry + 27 sections. Level 2: the tools, filtered as you type.*
-
-![tool view](assets/toolview.png)
+<img src="assets/toolview.png" width="860">
 
 *The per-tool view: usage, flags and a shell scoped to that tool.*
 
