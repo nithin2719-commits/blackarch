@@ -50,6 +50,19 @@ ALL_TOKENS="$(awk -F'|' '/^[[:space:]]*#/||NF<3{next}{print $3}' "$SECTIONS" | p
 # ---- collect all rows from the backend, once -----------------------------
 RAW="$BAT_CACHE/.index.raw"
 "backend_${BACKEND}_index" "$ALL_TOKENS" > "$RAW" || ui_die "Backend produced no tools."
+
+# Union with the catalogue. On Arch this is the fix for well-known tools that
+# ship OUTSIDE BlackArch's package groups -- wireshark-qt, zaproxy, ghidra,
+# rz-cutter, bettercap and friends are installed but in no blackarch-* group, so
+# the pacman pass alone never sees them and they were missing from the menu. The
+# catalogue resolves them from PATH and slots them into the right section; the
+# per-section de-dupe below drops anything the primary backend already listed.
+if [[ "$BACKEND" != catalog ]] && backend_catalog_available; then
+    added_before="$(wc -l < "$RAW")"
+    backend_catalog_index "$ALL_TOKENS" >> "$RAW" 2>/dev/null || true
+    echo "  + $(( $(wc -l < "$RAW") - added_before )) catalogue entries merged (tools outside BlackArch groups)"
+fi
+
 total_rows="$(wc -l < "$RAW")"
 ((total_rows)) || ui_die "No runnable tools found for this system."
 echo "  $total_rows runnable tool entries"
@@ -81,8 +94,9 @@ while IFS='|' read -r icon name tokens; do
     printf '  %-22s %5d tools\n' "$name" "$n"
 done < "$SECTIONS"
 
-# Flat index for the "search everything" entry.
-cat "$BAT_CACHE"/section_*.list 2>/dev/null | sort -u > "$BAT_CACHE/all.list"
+# Flat index for the "search everything" entry. De-dupe by BINARY (field 1) so a
+# tool that legitimately lives in two sections is listed once here.
+cat "$BAT_CACHE"/section_*.list 2>/dev/null | sort -t$'\t' -k1,1 -u > "$BAT_CACHE/all.list"
 
 printf '%s\n' "$(date +%s)" > "$BAT_CACHE/built_at"
 printf '%s\n' "$BACKEND"    > "$BAT_CACHE/backend"
