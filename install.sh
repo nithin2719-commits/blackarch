@@ -100,7 +100,10 @@ keybind_hyprland() {
     # each rejects the other's spelling outright -- so emit the one this
     # Hyprland can actually parse rather than leaving a config error behind.
     local rule ver major minor
-    ver="$(hyprctl version 2>/dev/null | grep -oP 'Hyprland \K[0-9]+\.[0-9]+' | head -1)"
+    # sed, not `grep -oP`: PCRE is a GNU-grep extension that busybox and BSD
+    # grep do not have, and this has to run wherever Hyprland does.
+    ver="$(hyprctl version 2>/dev/null \
+           | sed -n 's/.*Hyprland \([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | head -1)"
     major="${ver%%.*}"; minor="${ver#*.}"
     if [[ -n "$ver" ]] && { (( major > 0 )) || (( minor >= 55 )); }; then
         rule="windowrule = maximize true, match:class blackarch-toolview"

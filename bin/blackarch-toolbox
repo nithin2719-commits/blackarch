@@ -14,7 +14,18 @@
 
 set -uo pipefail
 
-SELF="$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+# Resolve this script through any symlinks -- the installer puts one in
+# ~/.local/bin -- WITHOUT `readlink -f`: that flag is a GNU extension that BSD
+# and older macOS readlink do not have, and it is the first thing this script
+# runs, so it would fail before anything else could. Walk the chain by hand.
+_self="${BASH_SOURCE[0]}"
+while [[ -L "$_self" ]]; do
+    _dir="$(cd -- "$(dirname -- "$_self")" && pwd)"
+    _self="$(readlink "$_self")"
+    [[ "$_self" != /* ]] && _self="$_dir/$_self"
+done
+SELF="$(cd -- "$(dirname -- "$_self")" && pwd)"
+unset _self _dir
 LIB="$SELF/../lib"
 # shellcheck source=/dev/null
 source "$LIB/paths.sh"
