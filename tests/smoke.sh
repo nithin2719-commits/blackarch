@@ -90,10 +90,13 @@ ok "description column starts at $widths distinct offset(s)"
   [[ -z "$(awk -F'\t' '$1=="tool"{print}' "$out")" ]] \
       || { echo "main box leaked tool rows"; exit 1; }
 
-  # an empty favorites file must not produce an empty folder row
+  # the folders are furniture: present even at zero, so the box never changes
+  # shape underneath the user and the features stay discoverable
   : > "$fav"; : > "$rec"
   build top > "$out"
-  [[ "$(wc -l < "$out")" -eq $((1 + secs)) ]] || { echo "empty folders not hidden"; exit 1; }
+  [[ "$(wc -l < "$out")" -eq $((3 + secs)) ]] || { echo "folders vanished when empty"; exit 1; }
+  [[ "$(cut -f1 "$out" | head -3 | tr '\n' ' ')" == "search favs recent " ]] \
+      || { echo "folder order changed when empty"; exit 1; }
   printf '%s\n' "$first" > "$fav"; printf '%s\n' "$first" > "$rec"
 
   # each folder holds only tools

@@ -10,14 +10,13 @@
 # mode=top   the main box. Every row is a DESTINATION, never a tool dump:
 #
 #              🔍 Search all tools     every indexed tool, one Enter away
-#              ★  Favorites            only when something is starred
-#              ↻  Recent               only when something has been used
+#              ★  Favorites            starred tools
+#              ↻  Recent               recently launched tools
 #                 27 categories
 #
 #            Favorites and Recent are folders of their own, exactly like the
 #            categories, so the box stays the same short shape however many
-#            tools get starred. They are omitted entirely when empty -- a row
-#            that opens nothing is a row that should not be there.
+#            tools get starred, and so the box always looks the same.
 #
 # mode=all   every tool, left in index (alphabetical) order, starred ones
 #            marked. Deliberately NOT reordered: this is the organised list you
@@ -89,11 +88,13 @@ function live_count(order, n,   i, c) {
 
 END {
     if (mode == "top") {
-        folder_row("search", "", "󰍉", ember, "Search all tools", ntool)
-        nf = live_count(favorder, nfav)
-        nr = live_count(recorder, nrec)
-        if (nf) folder_row("favs",   "", "★", ember, "Favorites", nf)
-        if (nr) folder_row("recent", "", "↻", faint, "Recent",    nr)
+        folder_row("search", "", "󰍉", blood, "Search all tools", ntool)
+        # Always shown, even at zero. They are part of the furniture: seeing
+        # "Favorites  0 tools" is how you learn the feature exists, and a box
+        # whose rows appear and disappear underneath you is worse than one
+        # row that is briefly empty.
+        folder_row("favs",   "", "★", blood, "Favorites", live_count(favorder, nfav))
+        folder_row("recent", "", "↻", blood, "Recent",    live_count(recorder, nrec))
         for (i = 1; i <= nsec; i++)
             folder_row("sec", sslug[i], sicon[i], blood, sname[i], scount[i])
     }

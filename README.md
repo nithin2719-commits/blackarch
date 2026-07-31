@@ -159,15 +159,15 @@ shape whether you have starred two tools or fifty:
 
 ```
   🔍 Search all tools   4181 tools ›    every indexed tool, one Enter away
-  ★  Favorites             2 tools ›    appears once you star something
-  ↻  Recent                3 tools ›    appears once you launch something
+  ★  Favorites             2 tools ›    what you starred with Ctrl+S
+  ↻  Recent                3 tools ›    filled in as you launch things
      Recon                640 tools ›
      Scanner              962 tools ›   …27 categories
 ```
 
 Every row opens a list of tools you filter by typing. **Favorites** and
-**Recent** are folders exactly like the categories, and are hidden entirely
-while empty — a row that opens nothing has no business being there.
+**Recent** are folders exactly like the categories, and stay in place even at
+zero, so the box never changes shape underneath you.
 
 **Don't know the name?** Pick a category and browse it — same picker, same keys.
 `Esc` goes back up, `Esc` again closes.
