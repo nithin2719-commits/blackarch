@@ -55,3 +55,28 @@ distribution, macOS, and Windows (through WSL).
   several users, each with their own index and history.
 
 [1.0.0]: https://github.com/nithin2719-commits/Blackarch_Toolbox/releases/tag/v1.0.0
+
+## [1.1.0]
+
+Search, favorites and recents — the launcher gets a front door.
+
+### Added
+- **Search all tools** is the first row of the menu: one `Enter` opens every
+  indexed tool as a single organised list you filter by typing.
+- **Favorites** — `Ctrl`+`S` stars the highlighted tool. Starred tools sit at
+  the top of the menu and of the search list.
+- **Recently used** — the last few launched tools appear under the favorites,
+  automatically. No configuration, no counters.
+- `tests/smoke.sh` and `tests/run-distros.sh`: the whole non-graphical surface,
+  run in containers on Arch, Debian, Ubuntu, Fedora and Alpine.
+
+### Fixed
+- `sprintf("%-*s", ...)` broke indexing entirely under busybox awk, so Alpine
+  could not build an index despite being a supported platform.
+- `readlink -f` in the entry point is a GNU extension; on BSD/macOS the command
+  would have failed on its first line.
+- `grep -oP` (PCRE) is not in busybox or BSD grep.
+- The BlackArch lockup changed size with the menu level, because the theme
+  scales it to the prompt widget and rofi sizes that widget from its (invisible)
+  prompt text.
+- The tool view opened as a small tile instead of filling the workspace.

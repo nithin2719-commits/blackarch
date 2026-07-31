@@ -17,14 +17,14 @@
 
 BlackArch ships thousands of security tools, but finding and remembering how to
 run them is its own job. **BlackArch Toolbox** turns the whole arsenal into a
-single keystroke: press **`Alt`+`A`**, then either type a tool's name or pick a
-category and drill in. Whatever you choose opens — a GUI tool in its own window,
+single keystroke: press **`Alt`+`A`**, type any part of a tool's name, and hit
+`Enter`. Don't know the name? Browse a category instead. Whatever you choose opens — a GUI tool in its own window,
 a command-line tool in a themed terminal that shows you exactly how to run it
 first.
 
 <div align="center">
 
-| Level 1 — search entry + sections | Level 2 — the tools, filtered as you type |
+| The default view — favorites, recents, categories | Typing searches every tool |
 |:---:|:---:|
 | <img src="assets/menu.png" width="420"> | <img src="assets/menu-tools.png" width="420"> |
 
@@ -45,9 +45,13 @@ catalogue against your `PATH`, so a tool shows up no matter how you installed it
 
 - **⌨️  One keybinding, everywhere** — `Alt`+`A` on Hyprland, sway, i3, GNOME,
   and Windows; a menu in any terminal over SSH.
-- **🧭  Two-level menu** — level 1 is a search entry plus 27 sections ordered
-  like an engagement (recon → scan → exploit → escalate → specialist benches);
-  level 2 is the tools themselves, filtered as you type.
+- **🔎  Search-first** — the first row is **Search all tools**: one `Enter`
+  into every indexed tool, filtered as you type.
+- **⭐  Favorites & recents** — starred tools and your last-used ones sit at the
+  top of the default view. `Ctrl`+`S` stars whatever is highlighted.
+- **🧭  Categories when you need them** — 27 sections ordered like an engagement
+  (recon → scan → exploit → escalate → specialist benches), for when you don't
+  know the tool's name.
 - **✅  Only runnable tools** — every entry is an executable that exists on your
   machine right now. No dead menu rows.
 - **📖  Never a blank prompt** — CLI tools open into a screen with their
@@ -147,27 +151,36 @@ Full steps: **[docs/INSTALL.md ▸ Windows](docs/INSTALL.md#windows-wsl)**.
 
 ## Usage
 
-The menu has exactly two levels, and the top one stays short on purpose — the
-arsenal is never dumped into the default view.
+The fast path is **`Alt`+`A`, `Enter`, type** — the search list is the first
+row, so it opens on the keystroke you were already pressing.
 
-**Level 1** — a single **Search all tools** entry, then the 27 sections with
-their tool counts. One line of status above them: how many tools are indexed,
-and the reminder that typing filters.
+The top view is short on purpose — every row is a destination, and the
+4000-tool list is not poured into it:
 
-**Level 2** — the list you drilled into, either the whole arsenal or one
-section. Type to filter, `Enter` launches, `Esc` goes back up. Each row is the
-tool name padded to a fixed column with its description beside it, so the
-descriptions line up as a second column rather than a ragged dump.
+```
+  🔍 Search all tools       one Enter into the full, organised list
+  ★  starred tools          the ones you reach for on purpose
+  ↻  recent tools           the ones you reached for last
+     27 categories          for when you don't know the name
+```
+
+`Enter` on **Search all tools** opens every indexed tool as one list you filter
+by typing. Starred and recent tools are lifted to the top of it and removed from
+the body, so no list ever offers the same tool twice.
+
+**Don't know the name?** Pick a category and browse it — same picker, same keys.
+`Esc` goes back up, `Esc` again closes.
 
 Filtering is **substring** matching, not fuzzy: typing `metasp` gives you the
-metasploit family and nothing else. (Fuzzy matching scatters the query letters
-across the row, which is how `metasploit` used to return `mentalist`.)
+metasploit family and nothing else. (Fuzzy scatters the query letters across the
+row, which is how `metasploit` used to return `mentalist`.)
 
 | Action | How |
 |--------|-----|
 | Open the menu | **`Alt`+`A`**, or `blackarch-toolbox` |
-| Search every tool | open **Search all tools**, then type any tool name |
+| Launch a tool by name | **`Alt`+`A`**, `Enter`, type any part of the name, `Enter` |
 | Browse a category | pick a section (e.g. **Web App**) to drill into it |
+| Star / unstar the highlighted tool | **`Ctrl`+`S`** (rofi and fzf) |
 | Go back a level | `Esc` |
 | Close the menu | `Esc` again, or press `Alt`+`A` a second time |
 | Rebuild the index (after installing tools) | `blackarch-toolbox --refresh` |
