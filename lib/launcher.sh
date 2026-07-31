@@ -186,10 +186,11 @@ build_tools() {  # $1 = list file
     done < "$1"
 }
 
+# Kept to a single short line: the previous three-clause version wrapped inside
+# the compact menu and pushed the rows down.
 top_status() {
-    local n; n="$(wc -l < "$BAT_CACHE/all.list" 2>/dev/null)"
-    printf "<span foreground='%s'>open <b>Search all tools</b> to find any of</span>  <span foreground='%s'><b>%s</b> tools</span>  <span foreground='%s'>·  or browse a section</span>" \
-        "$DIM" "$EMBER" "${n:-0}" "$FAINT"
+    printf "<span foreground='%s'>%s tools · type to search</span>" \
+        "$EMBER" "$(wc -l < "$BAT_CACHE/all.list")"
 }
 
 # Open a focused tool list (whole arsenal or one section) and launch the pick.
