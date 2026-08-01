@@ -4,6 +4,7 @@
 
 **One keybinding to launch any of BlackArch's ~4000 security tools — from a clean, searchable menu, on any Linux distro, macOS, or Windows.**
 
+[![tests](https://img.shields.io/github/actions/workflow/status/nithin2719-commits/blackarch_toolbox/tests.yml?branch=main&label=tests&style=flat-square&color=ff2b2b)](../../actions)
 [![Version](https://img.shields.io/badge/version-1.0.0-ff2b2b?style=flat-square)](CHANGELOG.md)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%2FWSL-ff7a45?style=flat-square)](docs/INSTALL.md)
 [![Shell](https://img.shields.io/badge/built%20with-bash%20%2B%20awk-9a7d7d?style=flat-square)](lib/)
@@ -93,13 +94,22 @@ versions it's verified against and the kernel each needs.
 
 ## Install
 
+**Arch / BlackArch** — from the AUR (once published):
+
+```bash
+yay -S blackarch-toolbox        # or: paru -S blackarch-toolbox
+blackarch-toolbox --refresh     # build the index
+```
+
+**Everywhere else, or to run from source:**
+
 > **TL;DR** — clone and run `./install.sh`. It needs no root, wires up
 > `Alt`+`A`, and builds the index. Full per-distro steps (dependency package
 > names for every OS) live in **[docs/INSTALL.md](docs/INSTALL.md)**.
 
 ```bash
-git clone https://github.com/nithin2719-commits/Blackarch_Toolbox.git
-cd Blackarch_Toolbox
+git clone https://github.com/nithin2719-commits/blackarch_toolbox.git
+cd blackarch_toolbox
 ./install.sh
 ```
 
@@ -128,7 +138,7 @@ sudo apk add bash gawk fzf git
 brew install bash gawk fzf git && brew install --cask kitty
 ```
 
-Then in every case: `git clone … && cd Blackarch_Toolbox && ./install.sh`
+Then in every case: `git clone … && cd blackarch_toolbox && ./install.sh`
 
 </details>
 

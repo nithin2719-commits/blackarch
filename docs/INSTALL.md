@@ -31,8 +31,8 @@ them — see [Getting the tools](#getting-the-tools) at the bottom.
 ## Quick install (any distro)
 
 ```bash
-git clone https://github.com/nithin2719-commits/Blackarch_Toolbox.git
-cd Blackarch_Toolbox
+git clone https://github.com/nithin2719-commits/blackarch_toolbox.git
+cd blackarch_toolbox
 ./install.sh
 ```
 
@@ -66,8 +66,8 @@ echo "$(curl -s https://blackarch.org/strap.sh.sha1sum)" | sha1sum -c   # verify
 sudo bash strap.sh
 
 # then install the toolbox
-git clone https://github.com/nithin2719-commits/Blackarch_Toolbox.git
-cd Blackarch_Toolbox && ./install.sh
+git clone https://github.com/nithin2719-commits/blackarch_toolbox.git
+cd blackarch_toolbox && ./install.sh
 ```
 
 Install tool groups you want, e.g. `sudo pacman -S blackarch-webapp`, then
@@ -84,8 +84,8 @@ are already present, so the menu fills out immediately.
 sudo apt update
 sudo apt install -y rofi kitty fzf git    # rofi/kitty optional; fzf always works
 
-git clone https://github.com/nithin2719-commits/Blackarch_Toolbox.git
-cd Blackarch_Toolbox && ./install.sh
+git clone https://github.com/nithin2719-commits/blackarch_toolbox.git
+cd blackarch_toolbox && ./install.sh
 ```
 
 On plain Debian/Ubuntu, install the tools you need from `apt` (or pipx/go), then
@@ -102,8 +102,8 @@ sudo apt install -y kali-tools-top10        # or kali-linux-large, etc.
 
 ```bash
 sudo dnf install -y rofi kitty fzf git
-git clone https://github.com/nithin2719-commits/Blackarch_Toolbox.git
-cd Blackarch_Toolbox && ./install.sh
+git clone https://github.com/nithin2719-commits/blackarch_toolbox.git
+cd blackarch_toolbox && ./install.sh
 ```
 
 Install security tools from Fedora's repos, `pipx`, `go install`, etc. The
@@ -115,8 +115,8 @@ catalogue backend picks them up from `PATH` on the next `--refresh`.
 
 ```bash
 sudo zypper install -y rofi kitty fzf git
-git clone https://github.com/nithin2719-commits/Blackarch_Toolbox.git
-cd Blackarch_Toolbox && ./install.sh
+git clone https://github.com/nithin2719-commits/blackarch_toolbox.git
+cd blackarch_toolbox && ./install.sh
 ```
 
 ---
@@ -125,8 +125,8 @@ cd Blackarch_Toolbox && ./install.sh
 
 ```bash
 sudo apk add bash gawk fzf git      # bash + gawk are required; fzf is the menu
-git clone https://github.com/nithin2719-commits/Blackarch_Toolbox.git
-cd Blackarch_Toolbox && ./install.sh --no-keybind
+git clone https://github.com/nithin2719-commits/blackarch_toolbox.git
+cd blackarch_toolbox && ./install.sh --no-keybind
 ```
 
 Alpine is common on headless boxes — `fzf` gives you the full menu in the
@@ -140,8 +140,8 @@ terminal with no desktop needed.
 brew install bash gawk fzf git          # macOS ships an ancient bash; brew's is required
 # optional GUI menu/terminal:
 brew install --cask kitty
-git clone https://github.com/nithin2719-commits/Blackarch_Toolbox.git
-cd Blackarch_Toolbox && ./install.sh --no-keybind
+git clone https://github.com/nithin2719-commits/blackarch_toolbox.git
+cd blackarch_toolbox && ./install.sh --no-keybind
 ```
 
 Bind a hotkey with Raycast, Alfred, or `skhd` to run `blackarch-toolbox`.

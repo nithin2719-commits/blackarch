@@ -1,0 +1,51 @@
+# The multi-distro claim is the project's main promise, so it is checked on
+# every push rather than asserted in the README. Each job is the plain distro
+# image with one security tool installed -- the point is that indexing, the CLI
+# and the row rendering all behave, not how many tools happen to be present.
+#
+# Alpine deliberately stays on busybox awk: it is the strictest awk in the
+# support matrix, and the one that caught sprintf("%-*s", ...) and a byte-range
+# regex that gawk and mawk both accepted.
+name: tests
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  distros:
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: archlinux:latest
+            setup: pacman -Sy --noconfirm --quiet nmap
+          - image: debian:12
+            setup: apt-get update -qq && apt-get install -y -qq nmap
+          - image: ubuntu:24.04
+            setup: apt-get update -qq && apt-get install -y -qq nmap
+          - image: fedora:41
+            setup: dnf install -y -q nmap
+          - image: alpine:3.20
+            setup: apk add --no-cache bash nmap
+    steps:
+      - uses: actions/checkout@v4
+      - name: install a tool to index
+        run: ${{ matrix.setup }}
+      - name: smoke tests
+        run: bash tests/smoke.sh
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+      # Errors fail the build; the remaining warnings are SC2034 on variables
+      # that are used from other sourced files, which shellcheck cannot see.
+      - run: shellcheck -S error bin/blackarch-toolbox install.sh lib/*.sh lib/backends/*.sh

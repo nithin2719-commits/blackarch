@@ -1,0 +1,22 @@
+pkgbase = blackarch-toolbox
+	pkgdesc = Search-first launcher for the security tools installed on your machine
+	pkgver = 1.0.0
+	pkgrel = 1
+	url = https://github.com/nithin2719-commits/blackarch_toolbox
+	install = blackarch-toolbox.install
+	arch = any
+	license = MIT
+	depends = bash
+	depends = awk
+	optdepends = rofi: graphical menu on X11/Wayland (the default)
+	optdepends = fuzzel: graphical menu on Wayland
+	optdepends = wofi: graphical menu on Wayland
+	optdepends = dmenu: graphical menu on X11
+	optdepends = fzf: terminal menu, for SSH and TTY use
+	optdepends = kitty: themed terminal for the per-tool view
+	optdepends = papirus-icon-theme: BlackArch icon for the menu
+	optdepends = libnotify: launch notifications
+	source = blackarch-toolbox-1.0.0.tar.gz::https://github.com/nithin2719-commits/blackarch_toolbox/archive/refs/tags/v1.0.0.tar.gz
+	sha256sums = a4af31b3c8aa669528610e5f49e37e0299d616afe7878882716df73959feeec9
+
+pkgname = blackarch-toolbox

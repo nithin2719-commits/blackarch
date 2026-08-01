@@ -10,7 +10,7 @@ pkgver=1.0.0
 pkgrel=1
 pkgdesc='Search-first launcher for the security tools installed on your machine'
 arch=('any')
-url='https://github.com/nithin2719-commits/blackarch'
+url='https://github.com/nithin2719-commits/blackarch_toolbox'
 license=('MIT')
 depends=('bash' 'awk')
 optdepends=(
@@ -23,17 +23,19 @@ optdepends=(
   'papirus-icon-theme: BlackArch icon for the menu'
   'libnotify: launch notifications'
 )
+# GitHub names the archive's top directory after the repo, not the package.
+_gitname=blackarch_toolbox
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')   # replace with the real digest once v1.0.0 is tagged
+sha256sums=('a4af31b3c8aa669528610e5f49e37e0299d616afe7878882716df73959feeec9')
 install="$pkgname.install"
 
 check() {
-  cd "$srcdir/blackarch-$pkgver"
+  cd "$srcdir/$_gitname-$pkgver"
   # The suite installs into a throwaway HOME, so it is safe in a build chroot.
   HOME="$srcdir/fakehome" make check
 }
 
 package() {
-  cd "$srcdir/blackarch-$pkgver"
+  cd "$srcdir/$_gitname-$pkgver"
   make DESTDIR="$pkgdir" PREFIX=/usr install
 }
