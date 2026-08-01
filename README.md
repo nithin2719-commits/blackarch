@@ -24,7 +24,7 @@ first.
 
 <div align="center">
 
-| The default view — favorites, recents, categories | Typing searches every tool |
+| The main box — search, favorites, recents, categories | Searching by name — exact match first |
 |:---:|:---:|
 | <img src="assets/menu.png" width="420"> | <img src="assets/menu-tools.png" width="420"> |
 
