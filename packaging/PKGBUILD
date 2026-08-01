@@ -1,0 +1,39 @@
+# Maintainer: nithin2719-commits <thangamnithin1980@gmail.com>
+#
+# A package may only place files under $pkgdir. It must not symlink into $HOME,
+# edit a compositor config, or build an index -- all of which install.sh does on
+# purpose for a manual install. So packaging goes through the Makefile, and the
+# keybinding stays the user's own step (see the post-install message).
+
+pkgname=blackarch-toolbox
+pkgver=1.0.0
+pkgrel=1
+pkgdesc='Search-first launcher for the security tools installed on your machine'
+arch=('any')
+url='https://github.com/nithin2719-commits/blackarch'
+license=('MIT')
+depends=('bash' 'awk')
+optdepends=(
+  'rofi: graphical menu on X11/Wayland (the default)'
+  'fuzzel: graphical menu on Wayland'
+  'wofi: graphical menu on Wayland'
+  'dmenu: graphical menu on X11'
+  'fzf: terminal menu, for SSH and TTY use'
+  'kitty: themed terminal for the per-tool view'
+  'papirus-icon-theme: BlackArch icon for the menu'
+  'libnotify: launch notifications'
+)
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')   # replace with the real digest once v1.0.0 is tagged
+install="$pkgname.install"
+
+check() {
+  cd "$srcdir/blackarch-$pkgver"
+  # The suite installs into a throwaway HOME, so it is safe in a build chroot.
+  HOME="$srcdir/fakehome" make check
+}
+
+package() {
+  cd "$srcdir/blackarch-$pkgver"
+  make DESTDIR="$pkgdir" PREFIX=/usr install
+}

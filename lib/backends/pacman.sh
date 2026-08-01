@@ -36,8 +36,17 @@ backend_pacman_index() {  # $1 = comma-separated list of every token in use
         pkg="${pkg%:}"
         case "$path" in
             */) continue ;;                       # directories
+            # Only files sitting DIRECTLY in a bin directory. The glob alone
+            # also matches nested paths, and the dockerscan package ships
+            # /usr/bin/dockerscan/ as a directory: that put the directory
+            # itself in the menu (-x is true for directories) plus the
+            # nvd2sqlite inside it, which is not on PATH under that name. Both
+            # were dead rows -- exactly what indexing /usr/bin is meant to
+            # prevent. -f rejects the directory; the nested-path check rejects
+            # anything a shell could not find by name.
+            /usr/bin/*/*|/usr/local/bin/*/*) continue ;;
             /usr/bin/*|/usr/local/bin/*)
-                [[ -x "$path" ]] || continue
+                [[ -f "$path" && -x "$path" ]] || continue
                 bin="${path##*/}"
                 PKG_BINS[$pkg]+="$bin "
                 ;;

@@ -1,0 +1,31 @@
+# A package must not edit a user's compositor config or desktop settings, so the
+# keybinding is left to the user. Say so once, plainly, rather than silently
+# installing something that appears to do nothing until a key is bound.
+
+post_install() {
+    cat <<'EOF'
+
+  BlackArch Toolbox is installed. Two things are left to you:
+
+    blackarch-toolbox --refresh     build the tool index (once, then after
+                                    installing new tools)
+
+  and a keybinding. Nothing was written to your config; add one yourself, e.g.
+
+    Hyprland  ~/.config/hypr/keybindings.conf
+              bind = ALT, A, exec, blackarch-toolbox
+    sway/i3   bindsym Mod1+a exec blackarch-toolbox
+    GNOME     Settings > Keyboard > Custom Shortcuts
+
+  Or just run `blackarch-toolbox`. Over SSH it falls back to fzf.
+
+EOF
+}
+
+post_upgrade() {
+    cat <<'EOF'
+
+  Tool index format may have changed -- run `blackarch-toolbox --refresh`.
+
+EOF
+}

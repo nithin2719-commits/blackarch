@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=BlackArch Toolbox
+GenericName=Security Tool Launcher
+Comment=Launch any installed security tool from one searchable menu
+Exec=blackarch-toolbox
+Icon=distributor-logo-blackarch
+Terminal=false
+Categories=Security;System;Utility;
+Keywords=security;pentest;blackarch;hacking;recon;forensics;

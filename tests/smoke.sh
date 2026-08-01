@@ -10,7 +10,19 @@ bad()  { printf '  FAIL  %s\n' "$1"; printf '        %s\n' "${2:-}"; FAIL=$((FAI
 printf '\n=== %s ===\n' "$(. /etc/os-release 2>/dev/null && echo "$PRETTY_NAME" || echo unknown)"
 printf 'bash %s | awk: %s\n\n' "${BASH_VERSION}" "$(awk --version 2>/dev/null | head -1 || awk -W version 2>&1 | head -1)"
 
-cd /repo || exit 1
+# Run from the repo root, wherever this script happens to live -- it is invoked
+# from a container mount, from `make check` inside a build chroot, and by hand.
+cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1
+
+# Run against a throwaway HOME. The suite installs the launcher and builds an
+# index, and neither belongs in the caller's real home -- this is run by hand on
+# a working machine and by `make check` inside a package build, and it must
+# leave no trace in either.
+export HOME="$(mktemp -d)"
+export XDG_CACHE_HOME="$HOME/.cache" XDG_CONFIG_HOME="$HOME/.config" \
+       XDG_STATE_HOME="$HOME/.local/state"
+export PATH="$HOME/.local/bin:$PATH"
+trap 'rm -rf "$HOME"' EXIT
 
 # 1. every script parses under this bash
 err="$(for f in bin/blackarch-toolbox install.sh lib/*.sh lib/backends/*.sh; do
