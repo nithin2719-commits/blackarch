@@ -363,3 +363,7 @@ seclists	misc	Collection of multiple types of security wordlists
 exploitdb	misc	Local copy of the Exploit Database
 tmux	misc	Terminal multiplexer for long-running engagements
 jq	misc	Command-line JSON processor
+nping	scanner	Packet generator and response analyser (nmap suite)
+dig	recon	DNS lookup utility
+strace	debugger	Trace system calls and signals
+ltrace	debugger	Trace library calls of a running process
