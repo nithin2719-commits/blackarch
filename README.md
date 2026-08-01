@@ -161,6 +161,7 @@ shape whether you have starred two tools or fifty:
   🔍 Search all tools   4311 tools ›    every indexed tool, one Enter away
   ★  Favorites             2 tools ›    what you starred with Ctrl+S
   ↻  Recent                3 tools ›    filled in as you launch things
+                                         (Ctrl+X forgets one)
      Recon                640 tools ›
      Scanner              962 tools ›   …27 categories
 ```
@@ -187,6 +188,7 @@ the row, which is how `metasploit` used to return `mentalist`.
 | Launch a tool by name | **`Alt`+`A`**, `Enter`, type any part of the name, `Enter` |
 | Browse a category | pick a section (e.g. **Web App**) to drill into it |
 | Star / unstar the highlighted tool | **`Ctrl`+`S`** (rofi and fzf) |
+| Forget the highlighted tool from Recent | **`Ctrl`+`X`** (rofi and fzf) |
 | Go back a level | `Esc` |
 | Close the menu | `Esc` again, or press `Alt`+`A` a second time |
 | Rebuild the index (after installing tools) | `blackarch-toolbox --refresh` |

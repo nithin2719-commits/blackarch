@@ -230,15 +230,22 @@ pick_from_list() {  # $1 = listfile  $2 = status  $3 = pango col  $4 = plain col
     while true; do
         choice="$(menu_pick "$status" "$listfile" "$pcol" "$tcol" "$sortmode")"
         [[ -z "$choice" ]] && return 1              # esc -> back to the main box
-        idx="${choice#fav }"
+        idx="${choice#* }"
         read_row "$listfile" "$idx" || return 1
         # Generated lists carry a kind column, so the binary is field 2; the
         # section lists written by refresh.sh start with the binary itself.
         if [[ "$ROW_A" == tool ]]; then bin="$ROW_B"; pkg="$ROW_C"
         else bin="$ROW_A"; pkg="$ROW_B"; fi
+        # Both keys act on the row and leave you in the list: you are curating,
+        # not launching, and being thrown back to the main box after every star
+        # would make curating a chore.
         if [[ "$choice" == fav\ * ]]; then
-            toggle_favorite "$bin"
-            continue                                 # stay put; starring is the point
+            toggle_favorite "$bin"; continue
+        fi
+        if [[ "$choice" == del\ * ]]; then
+            forget_recent "$bin"
+            build_menu recent "$LIST_FILE"           # refresh in place
+            continue
         fi
         record_recent "$bin"
         launch_tool "$bin" "$pkg"
@@ -270,7 +277,7 @@ while true; do
     choice="$(menu_pick "$(top_status)" "$MENU_LIST" 4 5)"
     [[ -z "$choice" ]] && break                      # esc -> close the launcher
     # Starring is meaningless on a folder row; ignore the key here.
-    [[ "$choice" == fav\ * ]] && continue
+    [[ "$choice" == fav\ * || "$choice" == del\ * ]] && continue
 
     read_row "$MENU_LIST" "$choice" || break
     case "$ROW_A" in

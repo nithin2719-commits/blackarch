@@ -41,3 +41,18 @@ record_recent() {
     } | head -n 50 > "$tmp"
     mv "$tmp" "$BAT_RECENT"
 }
+
+# Drop one tool from the recents. Bound to a key in the menu, because the list
+# is automatic: the only control you have over it is removing something you do
+# not want to see again.
+forget_recent() {
+    local bin="$1" tmp
+    [[ -n "$bin" && -s "$BAT_RECENT" ]] || return 0
+    tmp="$(mktemp)" || return 1
+    # No `&&` between these: grep exits 1 when it removes the only line, and
+    # under `set -o pipefail` that would skip the write and leave the entry in
+    # place. Same trap that once made record_recent silently do nothing.
+    grep -vxF "$bin" "$BAT_RECENT" > "$tmp"
+    mv "$tmp" "$BAT_RECENT"
+    ui_notify "Removed ${bin} from recent"
+}

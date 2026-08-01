@@ -15,6 +15,7 @@
 # menu_pick prints one of:
 #     <index>        a row was accepted
 #     fav <index>    the favourite-toggle key was pressed on that row
+#     del <index>    the forget-from-recent key was pressed on that row
 #     (nothing)      cancelled
 #
 # Order of preference (auto): rofi > fuzzel > wofi > dmenu   [graphical]
@@ -31,6 +32,11 @@ MENU_BACKEND=""     # resolved once by menu_init
 # Control+space; stealing those would break editing for anyone who uses it.
 MENU_FAV_KEY_ROFI='Control+s'
 MENU_FAV_KEY_FZF='ctrl-s'
+# Ctrl+X drops the highlighted tool from Recent -- x for cross out. Free in both
+# rofi and the compositors checked; Control+d and Control+w are already rofi
+# line-editing keys.
+MENU_DEL_KEY_ROFI='Control+x'
+MENU_DEL_KEY_FZF='ctrl-x'
 
 menu_init() {
     local want="${BAT_MENU:-auto}"
@@ -94,7 +100,8 @@ _menu_rofi() {
     # resized the brand. The context goes in the message strip instead.
     local args=(-dmenu -i -matching normal -markup-rows -format i
         -theme "$theme" -lines 14 -p '󰣇 BlackArch'
-        -kb-custom-1 "$MENU_FAV_KEY_ROFI")
+        -kb-custom-1 "$MENU_FAV_KEY_ROFI"
+        -kb-custom-2 "$MENU_DEL_KEY_ROFI")
     [[ -f "$icon" ]] && args+=(-window-icon "$icon")
     [[ -n "$mesg" ]] && args+=(-mesg "$mesg")
     [[ "$sortmode" == sort ]] && args+=(-sort)
@@ -102,7 +109,11 @@ _menu_rofi() {
     out="$(cut -f"$col" "$file" | rofi "${args[@]}")"; rc=$?
     [[ -z "$out" ]] && return 1
     # rofi exits 10 for -kb-custom-1, 11 for -custom-2, and so on.
-    if [[ $rc -eq 10 ]]; then printf 'fav %s' "$out"; else printf '%s' "$out"; fi
+    case "$rc" in
+        10) printf 'fav %s' "$out" ;;
+        11) printf 'del %s' "$out" ;;
+        *)  printf '%s' "$out" ;;
+    esac
 }
 
 # fuzzel/wofi/dmenu have no "return the index" mode, so we prepend a hidden
@@ -143,7 +154,7 @@ _menu_fzf() {
         | fzf --delimiter '\t' --with-nth 2.. --nth 2.. \
               --exact --prompt 'search> ' --header "$header" \
               --height 90% --reverse --ansi \
-              --expect "$MENU_FAV_KEY_FZF" \
+              --expect "$MENU_FAV_KEY_FZF,$MENU_DEL_KEY_FZF" \
               --color 'fg:#f0e6e6,bg:#0a0607,hl:#ff7a45,fg+:#ffffff,bg+:#23090b,hl+:#ff2b2b,prompt:#ff2b2b,header:#ff7a45,border:#ff2b2b' \
               --border \
         )" || return 1
@@ -152,6 +163,9 @@ _menu_fzf() {
     key="$(printf '%s' "$out" | head -1)"
     idx="$(printf '%s' "$out" | sed -n '2p')"; idx="${idx%%$'\t'*}"
     [[ -z "$idx" ]] && return 1
-    if [[ "$key" == "$MENU_FAV_KEY_FZF" ]]; then printf 'fav %s' "$idx"
-    else printf '%s' "$idx"; fi
+    case "$key" in
+        "$MENU_FAV_KEY_FZF") printf 'fav %s' "$idx" ;;
+        "$MENU_DEL_KEY_FZF") printf 'del %s' "$idx" ;;
+        *)                   printf '%s' "$idx" ;;
+    esac
 }

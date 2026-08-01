@@ -77,8 +77,30 @@ ok "description column starts at $widths distinct offset(s)"
   record_recent aaa; record_recent bbb; record_recent aaa
   [[ "$(head -1 "$BAT_RECENT")" == aaa ]] || { echo "recent order wrong"; exit 1; }
   [[ "$(grep -cxF aaa "$BAT_RECENT")" -eq 1 ]] || { echo "recent not deduped"; exit 1; }
+
+  # The empty-file cases, which are where this went wrong in the wild. Under
+  # `set -o pipefail`, `grep -vxF x empty-file` exits 1 and poisons the whole
+  # pipeline, so a `... && mv` writes nothing: the FIRST recent could never be
+  # saved, and because the file then stayed empty it never could -- Recent was
+  # permanently blank. The same shape hid in unstarring your last favourite.
+  : > "$BAT_RECENT"
+  record_recent solo
+  [[ "$(cat "$BAT_RECENT")" == solo ]] \
+      || { echo "first recent lost when the file was empty"; exit 1; }
+  : > "$BAT_FAVORITES"
+  toggle_favorite onlyfav
+  is_favorite onlyfav || { echo "could not star into an empty file"; exit 1; }
+  toggle_favorite onlyfav
+  is_favorite onlyfav && { echo "could not unstar the only favourite"; exit 1; }
+
+  # forgetting a recent, including the last one left
+  printf 'aa\nbb\n' > "$BAT_RECENT"
+  forget_recent aa
+  [[ "$(cat "$BAT_RECENT")" == bb ]] || { echo "forget_recent removed the wrong row"; exit 1; }
+  forget_recent bb
+  [[ -s "$BAT_RECENT" ]] && { echo "could not forget the last recent"; exit 1; }
   exit 0
-) && ok "favorites star/unstar, recents order + dedupe" \
+) && ok "favorites star/unstar, recents order/dedupe/forget" \
   || bad "favorites/recents state"
 
 # 8. the menu: a main box of destinations, and the folders it opens
