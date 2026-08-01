@@ -212,11 +212,11 @@ read_row() {  # $1 = file  $2 = index  $3.. = field names
 # ---- opening a folder ----------------------------------------------------
 # Every folder -- search, favorites, recent, a category -- is the same thing: a
 # list of tools you filter by typing. Same picker, same keys, same star toggle.
-pick_from_list() {  # $1 = listfile  $2 = status  $3 = pango col  $4 = plain col
-    local listfile="$1" status="$2" pcol="$3" tcol="$4" choice idx bin pkg
+pick_from_list() {  # $1 = listfile  $2 = status  $3 = pango col  $4 = plain col  $5 = sort?
+    local listfile="$1" status="$2" pcol="$3" tcol="$4" sortmode="${5:-}" choice idx bin pkg
     [[ -s "$listfile" ]] || return 1
     while true; do
-        choice="$(menu_pick "$status" "$listfile" "$pcol" "$tcol")"
+        choice="$(menu_pick "$status" "$listfile" "$pcol" "$tcol" "$sortmode")"
         [[ -z "$choice" ]] && return 1              # esc -> back to the main box
         idx="${choice#fav }"
         read_row "$listfile" "$idx" || return 1
@@ -236,7 +236,7 @@ pick_from_list() {  # $1 = listfile  $2 = status  $3 = pango col  $4 = plain col
 
 open_generated() {  # $1 = mode  $2 = label
     build_menu "$1" "$LIST_FILE"
-    pick_from_list "$LIST_FILE" "$(list_status "$2")" 4 5
+    pick_from_list "$LIST_FILE" "$(list_status "$2")" 4 5 sort
 }
 
 browse_section() {  # $1 = slug

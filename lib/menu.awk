@@ -29,6 +29,13 @@
 
 BEGIN { FS = OFS = "\t"; if (mode == "") mode = "top" }
 
+function esc(v) {
+    gsub(/&/, "\\&amp;", v)   # & first, then the angle brackets
+    gsub(/</, "\\&lt;",  v)
+    gsub(/>/, "\\&gt;",  v)
+    return v
+}
+
 FILENAME == favfile {
     if ($0 != "" && !($0 in isfav)) { isfav[$0] = 1; favorder[++nfav] = $0 }
     next
@@ -104,10 +111,25 @@ END {
     else if (mode == "recent") {
         for (i = 1; i <= nrec; i++) tool_row(recorder[i], "↻", faint)
     }
-    else {   # all
+    else {   # all -- the search list
+        # NAME ONLY, deliberately. rofi matches the whole row it is given and
+        # offers no way to match a subset of it, so any description left in the
+        # row is searchable too: typing "nmap" returned brutespray ("Brute-
+        # Forcing from Nmap output"), halcyon-ide, umit and a dozen more whose
+        # names have nothing to do with the query. -matching prefix does not
+        # help either -- it matches word prefixes anywhere in the row, so the
+        # description still matches. Dropping the description from THIS list is
+        # the only way to make the search mean "find me this tool by name".
+        # The section lists keep their descriptions: there you are browsing a
+        # known category, not hunting a name.
         for (i = 1; i <= ntool; i++) {
             bin = torder[i]
-            if (bin in isfav) tool_row(bin, "★", ember); else tool_row(bin, "", "")
+            mark = (bin in isfav) ? "★" : ""
+            if (bin in pango)
+                print "tool", bin, pkg[bin], \
+                    ((mark == "") ? "" : "<span foreground='" ember "'>" mark "</span>  ") \
+                        "<b>" esc(bin) "</b>", \
+                    ((mark == "") ? "" : mark " ") bin
         }
     }
 }

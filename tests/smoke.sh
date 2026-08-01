@@ -109,6 +109,13 @@ ok "description column starts at $widths distinct offset(s)"
   # the search list is every tool, in index order, exactly once each
   build all > "$out"
   [[ "$(wc -l < "$out")" -eq "$tools" ]] || { echo "search list != all tools"; exit 1; }
+
+  # and it carries NAMES ONLY: rofi matches whole rows, so any description left
+  # in here would be searchable and "nmap" would return tools named nothing like
+  # it, just because their description mentions nmap
+  desc="$(head -1 "$CACHE/all.list" | cut -f3)"
+  [[ -n "$desc" ]] && { awk -F'\t' -v d="$desc" 'index($4,d){f=1} END{exit !f}' "$out" \
+      && { echo "search list leaks descriptions into the matched text"; exit 1; }; }
   n=$(awk -F'\t' -v b="$first" '$2==b{c++} END{print c+0}' "$out")
   [[ "$n" -eq 1 ]] || { echo "row for $first appears $n times, want 1"; exit 1; }
   exit 0

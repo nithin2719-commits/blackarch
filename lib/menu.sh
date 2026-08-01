@@ -60,11 +60,14 @@ menu_has_fav_key() {
     case "$MENU_BACKEND" in rofi|fzf) return 0 ;; *) return 1 ;; esac
 }
 
-# menu_pick <mesg> <listfile> <pango-col> <plain-col>
+# menu_pick <mesg> <listfile> <pango-col> <plain-col> [sort]
+#   sort = "sort" ranks matches by closeness to what was typed, so an exact name
+#   lands first. Only the tool lists want it: the main box has a deliberate
+#   order (search, favorites, recent, categories) that sorting would scramble.
 menu_pick() {
-    local mesg="$1" file="$2" pcol="$3" tcol="$4"
+    local mesg="$1" file="$2" pcol="$3" tcol="$4" sortmode="${5:-}"
     case "$MENU_BACKEND" in
-        rofi)   _menu_rofi   "$mesg" "$file" "$pcol" ;;
+        rofi)   _menu_rofi   "$mesg" "$file" "$pcol" "$sortmode" ;;
         fuzzel) _menu_fuzzel "$mesg" "$file" "$tcol" ;;
         wofi)   _menu_wofi   "$mesg" "$file" "$tcol" ;;
         dmenu)  _menu_dmenu  "$mesg" "$file" "$tcol" ;;
@@ -74,7 +77,7 @@ menu_pick() {
 }
 
 _menu_rofi() {
-    local mesg="$1" file="$2" col="$3" out rc
+    local mesg="$1" file="$2" col="$3" sortmode="${4:-}" out rc
     local theme; theme="$(bat_theme_file rofi/blackarch-theme.rasi)"
     local icon="/usr/share/icons/Papirus/64x64/apps/distributor-logo-blackarch.svg"
 
@@ -94,6 +97,7 @@ _menu_rofi() {
         -kb-custom-1 "$MENU_FAV_KEY_ROFI")
     [[ -f "$icon" ]] && args+=(-window-icon "$icon")
     [[ -n "$mesg" ]] && args+=(-mesg "$mesg")
+    [[ "$sortmode" == sort ]] && args+=(-sort)
 
     out="$(cut -f"$col" "$file" | rofi "${args[@]}")"; rc=$?
     [[ -z "$out" ]] && return 1
