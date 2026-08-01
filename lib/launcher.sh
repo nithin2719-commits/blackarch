@@ -247,7 +247,9 @@ browse_section() {  # $1 = slug
     local listfile="$BAT_CACHE/section_${slug}.list" title
     [[ -f "$listfile" ]] || return 1
     title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
-    pick_from_list "$listfile" "$(list_status "${title:-tools}")" 3 4
+    # Sorted here too, so typing a name inside a category ranks the exact
+    # match first instead of leaving it wherever the alphabet put it.
+    pick_from_list "$listfile" "$(list_status "${title:-tools}")" 3 4 sort
 }
 
 # ---- main loop -----------------------------------------------------------

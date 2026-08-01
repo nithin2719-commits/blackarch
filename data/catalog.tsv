@@ -367,3 +367,21 @@ nping	scanner	Packet generator and response analyser (nmap suite)
 dig	recon	DNS lookup utility
 strace	debugger	Trace system calls and signals
 ltrace	debugger	Trace library calls of a running process
+mdk4	wireless	Wi-Fi testing tool: beacon, deauth and fuzzing attacks
+horst	wireless	Lightweight 802.11 wireless LAN analyser
+cowpatty	wireless	Offline dictionary attack against WPA/WPA2-PSK
+pixiewps	wireless	Offline brute force of the WPS pixie-dust flaw
+eaphammer	wireless	Evil-twin attacks against WPA2-Enterprise networks
+macchanger	wireless	View and manipulate a network interface's MAC address
+airgeddon	wireless	Multi-use bash script for wireless auditing
+dirsearch	webapp	Web path brute-forcer
+jwt_tool	webapp	Test, tamper with and crack JSON Web Tokens
+naabu	scanner	Fast SYN/CONNECT port scanner
+unicornscan	scanner	Asynchronous network stimulus delivery and scanning
+onesixtyone	scanner	Fast SNMP community string scanner
+ike-scan	scanner	Discover and fingerprint IKE/IPsec VPN servers
+smbclient	windows	FTP-like client to access SMB/CIFS shares
+nbtscan	windows	Scan networks for NetBIOS name information
+arping	networking	Send ARP requests to a neighbour host
+snmpwalk	networking	Retrieve a subtree of SNMP management values
+tor	proxy	Anonymising overlay network client

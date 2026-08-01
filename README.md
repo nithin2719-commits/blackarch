@@ -158,7 +158,7 @@ The main box holds **destinations, never tools** — so it is the same short
 shape whether you have starred two tools or fifty:
 
 ```
-  🔍 Search all tools   4181 tools ›    every indexed tool, one Enter away
+  🔍 Search all tools   4311 tools ›    every indexed tool, one Enter away
   ★  Favorites             2 tools ›    what you starred with Ctrl+S
   ↻  Recent                3 tools ›    filled in as you launch things
      Recon                640 tools ›
@@ -172,9 +172,11 @@ zero, so the box never changes shape underneath you.
 **Don't know the name?** Pick a category and browse it — same picker, same keys.
 `Esc` goes back up, `Esc` again closes.
 
-Filtering is **substring** matching, not fuzzy: typing `metasp` gives you the
-metasploit family and nothing else. (Fuzzy scatters the query letters across the
-row, which is how `metasploit` used to return `mentalist`.)
+**Search matches tool names, not descriptions.** Typing `nmap` gives you `nmap`
+first, then `wnmap`, `asnmap`, `lanmap2-cap` — not every tool whose blurb happens
+to mention nmap. Matching is **substring**, not fuzzy (fuzzy scatters the query
+letters across the row, which is how `metasploit` used to return `mentalist`),
+and results are ranked by closeness, so an exact name lands at the top.
 
 | Action | How |
 |--------|-----|
@@ -268,6 +270,114 @@ catalogue categories.
 
 ---
 
+## Getting the tools themselves
+
+The toolbox is a launcher, not a package manager — it shows what is **installed
+on this machine**. So the menu grows as you install tools. Pick whichever of
+these you actually need; none of it is required to use the launcher.
+
+### Arch / BlackArch — the full arsenal
+
+Add the BlackArch repository once, then install by category or by tool:
+
+```bash
+# add the repo (official strap script)
+curl -O https://blackarch.org/strap.sh
+echo "$(curl -s https://blackarch.org/strap.sh.sig | grep -o '[0-9a-f]\{40\}')  strap.sh" | sha1sum -c   # verify
+sudo chmod +x strap.sh && sudo ./strap.sh
+
+sudo pacman -Syu
+
+# then install what you want
+sudo pacman -S blackarch                 # everything (~50 GB, rarely what you want)
+sudo pacman -S blackarch-webapp          # one category
+sudo pacman -S blackarch-wireless        # another
+sudo pacman -S nmap sqlmap hydra         # individual tools
+
+blackarch-toolbox --refresh              # re-index
+```
+
+List the categories with `sudo pacman -Sg | grep blackarch`.
+
+### Kali / Parrot — metapackages
+
+```bash
+sudo apt update
+sudo apt install -y kali-tools-top10       # the usual suspects
+sudo apt install -y kali-tools-wireless    # or a category
+sudo apt install -y kali-linux-large       # a lot of it
+blackarch-toolbox --refresh
+```
+
+### Debian / Ubuntu
+
+Most classics are in the normal repositories:
+
+```bash
+sudo apt update && sudo apt install -y \
+  nmap masscan sqlmap nikto hydra john hashcat aircrack-ng kismet \
+  wireshark tshark tcpdump ettercap-text-only dsniff \
+  gobuster dirb wfuzz whatweb wafw00f dnsrecon dnsenum \
+  binwalk foremost exiftool steghide radare2 gdb ltrace strace \
+  smbclient enum4linux onesixtyone snmp arp-scan netdiscover hping3 \
+  proxychains4 tor socat netcat-openbsd
+blackarch-toolbox --refresh
+```
+
+For the Go/Python-native tools (`nuclei`, `subfinder`, `httpx`, `ffuf`,
+`feroxbuster`, `netexec`, `impacket`…):
+
+```bash
+sudo apt install -y pipx golang-go && pipx ensurepath
+pipx install netexec impacket sqlmap wpscan
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+go install -v github.com/ffuf/ffuf/v2@latest
+blackarch-toolbox --refresh
+```
+
+### Fedora / RHEL / Rocky / Alma
+
+```bash
+sudo dnf install -y nmap masscan sqlmap nikto hydra john hashcat \
+  aircrack-ng wireshark-cli tcpdump binwalk foremost perl-Image-ExifTool \
+  radare2 gdb ltrace strace samba-client tor socat nmap-ncat
+blackarch-toolbox --refresh
+```
+
+### openSUSE
+
+```bash
+sudo zypper install -y nmap sqlmap nikto hydra john hashcat aircrack-ng \
+  wireshark tcpdump binwalk radare2 gdb strace samba-client tor socat
+blackarch-toolbox --refresh
+```
+
+### Alpine
+
+```bash
+sudo apk add nmap nmap-scripts masscan nikto john hashcat aircrack-ng \
+  tcpdump binwalk radare2 gdb strace samba-client tor socat
+blackarch-toolbox --refresh
+```
+
+### macOS (Homebrew)
+
+```bash
+brew install nmap masscan sqlmap nikto hydra john-jumbo hashcat \
+  aircrack-ng wireshark tcpdump binwalk exiftool radare2 gdb \
+  socat tor gobuster ffuf
+blackarch-toolbox --refresh
+```
+
+### Windows
+
+The tools are Linux binaries, so they run inside WSL — install a distro, then
+follow the Kali or Debian steps above inside it. See
+**[docs/INSTALL.md ▸ Windows](docs/INSTALL.md#windows-wsl)**.
+
+---
+
 ## Adding your own tools
 
 The box shows what's installed. To add a tool it doesn't know yet, it's **one
@@ -279,15 +389,33 @@ line of text** — full guide in **[docs/ADDING-TOOLS.md](docs/ADDING-TOOLS.md)*
 sudo pacman -S sqlmap && blackarch-toolbox --refresh
 ```
 
-**On any other OS**, add a tab-separated line to
-[`data/catalog.tsv`](data/catalog.tsv) — `binary`, `category`, `description`:
+**Anywhere else** (and for anything outside BlackArch's groups), add a
+tab-separated line to [`data/catalog.tsv`](data/catalog.tsv) —
+`binary`, `category`, `description`:
 
 ```
 dnsx	recon	Fast and multi-purpose DNS toolkit
 ```
 
 …then `blackarch-toolbox --refresh`. The tool appears in **Recon** as soon as
-`dnsx` is on your `PATH`.
+`dnsx` is on your `PATH` — and never before, so the menu can't offer you
+something that isn't there.
+
+**Valid categories** are the section slugs — list them with:
+
+```bash
+cut -f2 data/catalog.tsv | grep -v '^#' | sort -u
+```
+
+**A tool that isn't on your `PATH`** (a `.jar`, a cloned repo, a script) just
+needs a wrapper somewhere on `PATH`:
+
+```bash
+mkdir -p ~/.local/bin
+printf '#!/bin/sh\nexec java -jar /opt/burpsuite.jar "$@"\n' > ~/.local/bin/burpsuite
+chmod +x ~/.local/bin/burpsuite
+blackarch-toolbox --refresh
+```
 
 ---
 

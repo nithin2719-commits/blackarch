@@ -122,13 +122,30 @@ ok "description column starts at $widths distinct offset(s)"
 ) && ok "menu: main box of destinations, folders hold only tools" \
   || bad "menu list build"
 
-# 9. read-only CLI surface
+# 9. the catalogue: well formed, and every slug maps to a real section
+(
+  awk -F'\t' '!/^#/ && NF && NF!=3 {print "row "NR" has "NF" fields"; bad=1} END{exit bad+0}' \
+      data/catalog.tsv || exit 1
+  awk -F'\t' '!/^#/ && NF{k=$1"\t"$2; if(seen[k]++) {print "duplicate: "$1" in "$2; bad=1}} END{exit bad+0}' \
+      data/catalog.tsv || exit 1
+  # section slugs come from data/sections.conf; a catalogue row pointing at a
+  # slug that no section claims would index into a section that never shows
+  slugs="$(grep -vE '^#|^$' data/sections.conf | cut -d'|' -f3 | tr ',' '\n' \
+           | sed 's/blackarch-//' | sort -u)"
+  for sl in $(grep -vE '^#|^$' data/catalog.tsv | cut -f2 | sort -u); do
+    printf '%s\n' "$slugs" | grep -qx "$sl" || { echo "orphan slug: $sl"; exit 1; }
+  done
+  exit 0
+) && ok "catalogue: $(grep -vcE '^#|^$' data/catalog.tsv) entries, well formed, no orphan slugs" \
+  || bad "catalogue validation"
+
+# 10. read-only CLI surface
 for flag in --version --help --config --list; do
     o="$("$BIN" $flag 2>&1)"; r=$?
     [[ $r -eq 0 && -n "$o" ]] && ok "$flag" || bad "$flag (exit $r)" "$(echo "$o" | tail -5)"
 done
 
-# 10. menu backend detection must pick the terminal fallback when headless
+# 11. menu backend detection must pick the terminal fallback when headless
 o="$("$BIN" --config 2>&1 | grep -i menu)"
 ok "headless menu resolution: ${o:-none}"
 
