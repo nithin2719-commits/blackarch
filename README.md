@@ -172,11 +172,14 @@ zero, so the box never changes shape underneath you.
 **Don't know the name?** Pick a category and browse it — same picker, same keys.
 `Esc` goes back up, `Esc` again closes.
 
-**Search matches tool names, not descriptions.** Typing `nmap` gives you `nmap`
-first, then `wnmap`, `asnmap`, `lanmap2-cap` — not every tool whose blurb happens
-to mention nmap. Matching is **substring**, not fuzzy (fuzzy scatters the query
-letters across the row, which is how `metasploit` used to return `mentalist`),
-and results are ranked by closeness, so an exact name lands at the top.
+**Search matches tool names, not descriptions** — while still showing the
+descriptions. Typing `nmap` gives you `nmap` first, then `wnmap`, `asnmap`,
+`lanmap2-cap`; you don't get `brutespray` just because its blurb says "Brute-
+Forcing from Nmap output". Shorter names rank first, so the tool whose exact
+name you typed is the one at the top.
+
+Matching is **substring**, not fuzzy — fuzzy scatters the query letters across
+the row, which is how `metasploit` used to return `mentalist`.
 
 | Action | How |
 |--------|-----|

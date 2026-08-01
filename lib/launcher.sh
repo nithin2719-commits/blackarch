@@ -176,6 +176,18 @@ build_menu() {
         -v namew=20 -v blood='#ff2b2b' -v ember="$EMBER" -v faint="$FAINT" \
         "$BAT_FAVORITES" "$BAT_RECENT" \
         "$BAT_CACHE/sections.list" "$BAT_CACHE/all.list" > "$2"
+
+    # Order the search list by name LENGTH, then alphabetically. Ordering is the
+    # only lever left for relevance: rofi's -sort measures the whole row, so the
+    # row with the shortest DESCRIPTION won rather than the closest name, and
+    # "nmap" ranked nmap last behind wnmap and asnmap. Shortest-name-first means
+    # the tool you typed the exact name of is the tool at the top, with the
+    # longer names that merely contain it underneath.
+    if [[ "$1" == all ]]; then
+        awk -F'\t' '{ print length($2) "\t" $0 }' "$2" \
+            | sort -t$'\t' -k1,1n -k3,3 | cut -f2- > "$2.sorted" \
+            && mv "$2.sorted" "$2"
+    fi
 }
 
 # The status strip is the only chrome, so it earns its line: how much there is
@@ -236,7 +248,7 @@ pick_from_list() {  # $1 = listfile  $2 = status  $3 = pango col  $4 = plain col
 
 open_generated() {  # $1 = mode  $2 = label
     build_menu "$1" "$LIST_FILE"
-    pick_from_list "$LIST_FILE" "$(list_status "$2")" 4 5 sort
+    pick_from_list "$LIST_FILE" "$(list_status "$2")" 4 5
 }
 
 browse_section() {  # $1 = slug
@@ -247,9 +259,7 @@ browse_section() {  # $1 = slug
     local listfile="$BAT_CACHE/section_${slug}.list" title
     [[ -f "$listfile" ]] || return 1
     title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
-    # Sorted here too, so typing a name inside a category ranks the exact
-    # match first instead of leaving it wherever the alphabet put it.
-    pick_from_list "$listfile" "$(list_status "${title:-tools}")" 3 4 sort
+    pick_from_list "$listfile" "$(list_status "${title:-tools}")" 3 4
 }
 
 # ---- main loop -----------------------------------------------------------

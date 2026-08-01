@@ -110,14 +110,16 @@ ok "description column starts at $widths distinct offset(s)"
   build all > "$out"
   [[ "$(wc -l < "$out")" -eq "$tools" ]] || { echo "search list != all tools"; exit 1; }
 
-  # and it carries NAMES ONLY: rofi matches whole rows, so any description left
-  # in here would be searchable and "nmap" would return tools named nothing like
-  # it, just because their description mentions nmap
-  desc="$(head -1 "$CACHE/all.list" | cut -f3)"
-  [[ -n "$desc" ]] && { awk -F'\t' -v d="$desc" 'index($4,d){f=1} END{exit !f}' "$out" \
-      && { echo "search list leaks descriptions into the matched text"; exit 1; }; }
-  n=$(awk -F'\t' -v b="$first" '$2==b{c++} END{print c+0}' "$out")
-  [[ "$n" -eq 1 ]] || { echo "row for $first appears $n times, want 1"; exit 1; }
+  # Descriptions ARE shown, but must be unsearchable: render.awk interleaves
+  # them with U+200C so no typed string can match them. Without this, "nmap"
+  # returns every tool whose blurb mentions nmap.
+  awk -F'\t' 'NR==1{ if (index($4, "\342\200\214") == 0) exit 1 }' "$out" \
+      || { echo "search rows carry a searchable description"; exit 1; }
+  # the name itself must NOT be interleaved, or it would stop matching too
+  first_row_name="$(head -1 "$out" | cut -f2)"
+  awk -F'\t' -v n="$first_row_name" 'NR==1{ if (index($4, n) == 0) exit 1 }' "$out" \
+      || { echo "the tool name is not matchable"; exit 1; }
+
   exit 0
 ) && ok "menu: main box of destinations, folders hold only tools" \
   || bad "menu list build"

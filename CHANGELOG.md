@@ -81,9 +81,10 @@ Search, favorites and recents — the launcher gets a front door.
   absent from the menu. It now merges the same `data/catalog.tsv` the portable
   backend uses, so there is one source of truth instead of a list to maintain.
 - **Search matched descriptions.** Typing `nmap` returned `brutespray`,
-  `halcyon-ide` and `umit`, whose descriptions mention nmap. The search list
-  carries names only now, and results are ranked by closeness so the exact name
-  is first.
+  `halcyon-ide` and `umit`, whose descriptions mention nmap. Descriptions are
+  still shown, but are now interleaved with a zero-width non-joiner so nothing
+  typed can match them, and the search list is ordered shortest-name-first so
+  the exact name you typed lands at the top.
 
 - `sprintf("%-*s", ...)` broke indexing entirely under busybox awk, so Alpine
   could not build an index despite being a supported platform.
