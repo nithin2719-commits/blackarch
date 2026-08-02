@@ -146,7 +146,7 @@ Full steps: **[docs/INSTALL.md ▸ Windows](docs/INSTALL.md#windows-wsl)**.
 | Action | How |
 |--------|-----|
 | Open the menu | **`Alt`+`A`**, or `blackarch-toolbox` |
-| Search every tool | just start typing a tool name — the whole arsenal is searchable from the top menu |
+| Search every tool | open **Search all tools**, then type any tool name |
 | Browse a category | pick a section (e.g. **Web App**) to drill into it |
 | Go back a level | `Esc` |
 | Close the menu | `Esc` again, or press `Alt`+`A` a second time |

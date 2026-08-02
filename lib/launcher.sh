@@ -41,6 +41,26 @@ trap 'rm -f "$PIDFILE"' EXIT
 menu_init || ui_die "No menu program found. Install one of: rofi, fuzzel, wofi, dmenu, or fzf."
 term_init
 
+# ---- Hyprland presentation (optional eye-candy) --------------------------
+# When running under Hyprland with the rofi backend, present the launcher as a
+# real window titled "BlackArchToolbox" (see menu.sh) and register rules for it
+# at RUNTIME -- so there is no persistent config-error nag and every other rofi
+# menu is untouched. Result: it floats at the left, slides in, and wears a red
+# gradient border that Hyprland's global `borderangle` animation rotates into a
+# red light spinning around the box. Silently skipped on anything else.
+apply_hypr_rules() {
+    [[ "$MENU_BACKEND" == rofi ]] || return 0
+    [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && command -v hyprctl >/dev/null 2>&1 || return 0
+    local T='title:^(BlackArchToolbox)$'
+    hyprctl --batch "\
+keyword windowrulev2 float,$T ; \
+keyword windowrulev2 move 10 52,$T ; \
+keyword windowrulev2 bordersize 3,$T ; \
+keyword windowrulev2 bordercolor rgba(ff2b2bff) rgba(3a0000ff) rgba(ff6a6aff) 45deg,$T ; \
+keyword windowrulev2 animation slide,$T" >/dev/null 2>&1
+}
+apply_hypr_rules
+
 # ---- build the index on first run (or if missing) ------------------------
 if [[ ! -f "$BAT_CACHE/sections.list" ]]; then
     command -v notify-send >/dev/null 2>&1 && \
@@ -151,13 +171,16 @@ launch_tool() {
 }
 
 # ---- section level -------------------------------------------------------
-# Builds the section header rows only. NSEC records how many there are, so the
-# combined top menu (sections followed by every tool) can tell a section pick
-# apart from a tool pick by index.
-NSEC=0
+# A clean top menu: a single "Search all tools" entry first (open it to
+# type-search the whole arsenal), then the section headers to browse. The full
+# tool list is never dumped into the top view -- it appears only inside the
+# search or a section, so the default view stays tidy.
 build_sections() {
     SEC_PANGO=(); SEC_PLAIN=(); SEC_SLUG=()
     local NAMEW=20 icon name slug count ename padded
+    SEC_PANGO+=("<span foreground='${EMBER}'></span>   <b>$(printf '%-*s' "$NAMEW" 'Search all tools')</b>  <span size='small' foreground='${FAINT}'>type any tool name  ›</span>")
+    SEC_PLAIN+=("$(printf '  %-*s  %s' "$NAMEW" 'Search all tools' 'type any tool name')")
+    SEC_SLUG+=("__search__")
     while IFS=$'\t' read -r icon name slug count; do
         padded="$(printf '%-*s' "$NAMEW" "$name")"
         ename="$(printf '%s' "$padded" | pango_escape)"
@@ -165,7 +188,6 @@ build_sections() {
         SEC_PLAIN+=("$(printf '%s %-*s  %4s tools  >' "$icon" "$NAMEW" "$name" "$count")")
         SEC_SLUG+=("$slug")
     done < "$BAT_CACHE/sections.list"
-    NSEC=${#SEC_SLUG[@]}
 }
 
 # ---- tool level ----------------------------------------------------------
@@ -186,41 +208,36 @@ build_tools() {  # $1 = list file
 
 top_status() {
     local n; n="$(wc -l < "$BAT_CACHE/all.list" 2>/dev/null)"
-    printf "<span foreground='%s'>type a tool name to search</span>  <span foreground='%s'>·</span>  <span foreground='%s'>pick a section to browse</span>  <span foreground='%s'>·  <b>%s</b> tools</span>" \
-        "$BONE" "$FAINT" "$DIM" "$FAINT" "${n:-0}"
+    printf "<span foreground='%s'>open <b>Search all tools</b> to find any of</span>  <span foreground='%s'><b>%s</b> tools</span>  <span foreground='%s'>·  or browse a section</span>" \
+        "$DIM" "$EMBER" "${n:-0}" "$FAINT"
 }
 
-# Drill into a section: list its tools and launch the pick.
-open_section() {  # $1 = slug
-    local slug="$1" listfile title tidx
-    listfile="$BAT_CACHE/section_${slug}.list"
-    [[ -f "$listfile" ]] || return 1
-    build_tools "$listfile"
-    title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
-    tidx="$(menu_pick "󰣇 ${title:-tools}" "ESC · back" TOOL_PLAIN TOOL_PANGO)"
+# Open a focused tool list (whole arsenal or one section) and launch the pick.
+pick_and_launch() {  # $1 = listfile  $2 = prompt  $3 = mesg
+    build_tools "$1"
+    local tidx; tidx="$(menu_pick "$2" "$3" TOOL_PLAIN TOOL_PANGO)"
     [[ -z "$tidx" ]] && return 1
     launch_tool "${TOOL_BIN[$tidx]}" "${TOOL_PKG[$tidx]}"
 }
 
 # ---- main loop -----------------------------------------------------------
-# One combined top menu: the section headers first (to browse), then every tool
-# (so the single search box matches any tool by name -- no "search all" detour).
-# A pick with index < NSEC is a section to drill into; anything past that is the
-# (idx-NSEC)-th tool.
+# Two clean levels: the top shows "Search all tools" + the sections; picking
+# either opens a focused, type-to-filter list. The full tool list is never
+# dumped into the top view.
 while true; do
     build_sections
-    build_tools "$BAT_CACHE/all.list"
-    MENU_PANGO=( "${SEC_PANGO[@]}" "${TOOL_PANGO[@]}" )
-    MENU_PLAIN=( "${SEC_PLAIN[@]}" "${TOOL_PLAIN[@]}" )
-
-    idx="$(menu_pick "󰣇 BlackArch" "$(top_status)" MENU_PLAIN MENU_PANGO)"
+    idx="$(menu_pick "󰣇 BlackArch" "$(top_status)" SEC_PLAIN SEC_PANGO)"
     [[ -z "$idx" ]] && break
+    slug="${SEC_SLUG[$idx]}"
 
-    if ((idx < NSEC)); then
-        open_section "${SEC_SLUG[$idx]}" || continue
+    if [[ "$slug" == "__search__" ]]; then
+        pick_and_launch "$BAT_CACHE/all.list" "󰣇 search all" "type a tool name · ESC back" || continue
         break
     fi
-    t=$((idx - NSEC))
-    launch_tool "${TOOL_BIN[$t]}" "${TOOL_PKG[$t]}"
+
+    listfile="$BAT_CACHE/section_${slug}.list"
+    [[ -f "$listfile" ]] || continue
+    title="$(awk -F'\t' -v s="$slug" '$3==s{print $2}' "$BAT_CACHE/sections.list")"
+    pick_and_launch "$listfile" "󰣇 ${title:-tools}" "ESC · back to menu" || continue
     break
 done

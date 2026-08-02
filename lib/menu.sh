@@ -58,7 +58,11 @@ _menu_rofi() {
     local prompt="$1" mesg="$2"; local -n _rows="$3"
     local theme; theme="$(bat_theme_file rofi/blackarch-theme.rasi)"
     local icon="/usr/share/icons/Papirus/64x64/apps/distributor-logo-blackarch.svg"
+    # -normal-window + a unique title let Hyprland target ONLY this window for the
+    # spinning-border / slide rules (see launcher.sh apply_hypr_rules); harmless
+    # elsewhere.
     local args=(-dmenu -i -matching fuzzy -no-sort -markup-rows -format i
+        -normal-window -window-title "BlackArchToolbox"
         -theme "$theme" -lines 14 -p "$prompt")
     [[ -f "$icon" ]] && args+=(-window-icon "$icon")
     [[ -n "$mesg" ]] && args+=(-mesg "$mesg")
