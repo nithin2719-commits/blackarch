@@ -28,17 +28,17 @@
 window {
     transparency:     "real";
     background-color: @bg;
-    border:           1px;
+    border:           2px;
     border-color:     @blood;
     border-radius:    16px;
-    width:            720px;
+    width:            560px;   /* compact, as before */
     padding:          0px;
 
     /* Flush to the top-left corner, just under the waybar. */
     location:         north west;
     anchor:           north west;
-    x-offset:         12px;
-    y-offset:         12px;
+    x-offset:         10px;
+    y-offset:         8px;
 }
 
 mainbox {
@@ -51,17 +51,19 @@ mainbox {
    live search field beside it. */
 inputbar {
     background-color: @bg-inputs;
-    border-radius:    16px 16px 0px 0px;
+    border-radius:    14px 14px 0px 0px;
     border:           0px 0px 1px 0px;
     border-color:     @blood;
-    padding:          18px 22px;
-    spacing:          16px;
+    padding:          16px 18px;
+    spacing:          14px;
     children:         [ "prompt", "entry" ];
 }
 
+/* The BlackArch lockup. The image scales to this width, so a larger width = a
+   bigger, more prominent logo/wordmark. */
 prompt {
     expand:           false;
-    width:            300px;
+    width:            420px;
     text-color:       transparent;
     background-color: transparent;
     background-image: url("@@BAT_ASSETS@@/brand_rofi.png", width);
@@ -92,9 +94,9 @@ textbox {
 listview {
     background-color: transparent;
     columns:          1;
-    lines:            16;
-    spacing:          3px;
-    padding:          12px 10px;
+    lines:            13;
+    spacing:          2px;
+    padding:          8px 8px;
     scrollbar:        true;
     fixed-height:     false;
     dynamic:          true;
@@ -107,8 +109,8 @@ scrollbar {
 }
 
 element {
-    padding:       11px 16px;
-    border-radius: 9px;
+    padding:       9px 14px;
+    border-radius: 8px;
     spacing:       12px;
     cursor:        pointer;
 }
