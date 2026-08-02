@@ -29,7 +29,7 @@
     <!-- status message -->
     <rect x="0" y="76" width="620" height="34" fill="#100a0b"/>
     <line x1="0" y1="110" x2="620" y2="110" stroke="#21100f" stroke-width="1"/>
-    <text x="26" y="98" font-family="JetBrainsMono Nerd Font, monospace" font-size="13" xml:space="preserve"><tspan fill="#f4ecec">type a tool name to search</tspan><tspan fill="#6a5555">   ·   </tspan><tspan fill="#b09a9a">pick a section to browse</tspan><tspan fill="#6a5555">   ·   </tspan><tspan fill="#ff7a45" font-weight="700">4340</tspan><tspan fill="#6a5555"> tools</tspan></text>
+    <text x="26" y="98" font-family="JetBrainsMono Nerd Font, monospace" font-size="13" xml:space="preserve"><tspan fill="#b09a9a">open </tspan><tspan fill="#f4ecec" font-weight="700">Search all tools</tspan><tspan fill="#b09a9a"> to find any of </tspan><tspan fill="#ff7a45" font-weight="700">4340</tspan><tspan fill="#b09a9a"> tools</tspan><tspan fill="#6a5555">   ·   or browse a section</tspan></text>
 
     <!-- rows -->
     <g font-family="JetBrainsMono Nerd Font, monospace" font-size="16">
@@ -37,24 +37,25 @@
       <g transform="translate(14 124)">
         <rect x="0" y="0" width="592" height="44" rx="9" fill="#2a0b0e"/>
         <rect x="0" y="0" width="3" height="44" rx="1.5" fill="#ff2b2b"/>
-        <rect x="20" y="15" width="11" height="11" rx="2" fill="#ff2b2b"/>
-        <text x="44" y="28" fill="#f4ecec" font-weight="700">Recon</text>
-        <text x="580" y="28" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">633 tools  ›</text>
+        <circle cx="26" cy="21" r="6" fill="none" stroke="#ff7a45" stroke-width="2"/>
+        <line x1="30" y1="25" x2="34" y2="29" stroke="#ff7a45" stroke-width="2" stroke-linecap="round"/>
+        <text x="46" y="28" fill="#f4ecec" font-weight="700">Search all tools</text>
+        <text x="580" y="28" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">type any tool name  ›</text>
       </g>
 
       <!-- section rows: marker, name, count, drill chevron -->
       <g fill="#b09a9a">
-        <g transform="translate(14 176)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Scanner</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">955 tools  ›</text></g>
-        <g transform="translate(14 216)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Web App</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">503 tools  ›</text></g>
-        <g transform="translate(14 256)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Fuzzer</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">304 tools  ›</text></g>
-        <g transform="translate(14 296)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Exploitation</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">508 tools  ›</text></g>
-        <g transform="translate(14 336)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Cracker</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">338 tools  ›</text></g>
-        <g transform="translate(14 376)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Passwords &amp; Crypto</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">167 tools  ›</text></g>
-        <g transform="translate(14 416)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Windows &amp; AD</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">131 tools  ›</text></g>
-        <g transform="translate(14 456)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Backdoor &amp; Post</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">165 tools  ›</text></g>
-        <g transform="translate(14 496)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Sniffer &amp; MitM</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">281 tools  ›</text></g>
-        <g transform="translate(14 536)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Wireless</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">178 tools  ›</text></g>
-        <g transform="translate(14 576)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Bluetooth &amp; NFC</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">60 tools  ›</text></g>
+        <g transform="translate(14 176)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Recon</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">633 tools  ›</text></g>
+        <g transform="translate(14 216)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Scanner</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">955 tools  ›</text></g>
+        <g transform="translate(14 256)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Web App</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">503 tools  ›</text></g>
+        <g transform="translate(14 296)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Fuzzer</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">304 tools  ›</text></g>
+        <g transform="translate(14 336)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Exploitation</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">508 tools  ›</text></g>
+        <g transform="translate(14 376)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Cracker</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">338 tools  ›</text></g>
+        <g transform="translate(14 416)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Passwords &amp; Crypto</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">167 tools  ›</text></g>
+        <g transform="translate(14 456)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Windows &amp; AD</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">131 tools  ›</text></g>
+        <g transform="translate(14 496)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Backdoor &amp; Post</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">165 tools  ›</text></g>
+        <g transform="translate(14 536)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Sniffer &amp; MitM</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">281 tools  ›</text></g>
+        <g transform="translate(14 576)"><rect x="20" y="14" width="10" height="10" rx="2" fill="#ff2b2b"/><text x="44" y="26">Wireless</text><text x="580" y="26" text-anchor="end" fill="#6a5555" font-size="13" xml:space="preserve">178 tools  ›</text></g>
       </g>
     </g>
 
