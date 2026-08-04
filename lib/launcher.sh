@@ -41,26 +41,6 @@ trap 'rm -f "$PIDFILE"' EXIT
 menu_init || ui_die "No menu program found. Install one of: rofi, fuzzel, wofi, dmenu, or fzf."
 term_init
 
-# ---- Hyprland presentation (optional eye-candy) --------------------------
-# When running under Hyprland with the rofi backend, present the launcher as a
-# real window titled "BlackArchToolbox" (see menu.sh) and register rules for it
-# at RUNTIME -- so there is no persistent config-error nag and every other rofi
-# menu is untouched. Result: it floats at the left, slides in, and wears a red
-# gradient border that Hyprland's global `borderangle` animation rotates into a
-# red light spinning around the box. Silently skipped on anything else.
-apply_hypr_rules() {
-    [[ "$MENU_BACKEND" == rofi ]] || return 0
-    [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && command -v hyprctl >/dev/null 2>&1 || return 0
-    local T='title:^(BlackArchToolbox)$'
-    hyprctl --batch "\
-keyword windowrulev2 float,$T ; \
-keyword windowrulev2 move 10 52,$T ; \
-keyword windowrulev2 bordersize 3,$T ; \
-keyword windowrulev2 bordercolor rgba(ff2b2bff) rgba(3a0000ff) rgba(ff6a6aff) 45deg,$T ; \
-keyword windowrulev2 animation slide,$T" >/dev/null 2>&1
-}
-apply_hypr_rules
-
 # ---- build the index on first run (or if missing) ------------------------
 if [[ ! -f "$BAT_CACHE/sections.list" ]]; then
     command -v notify-send >/dev/null 2>&1 && \
