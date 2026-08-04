@@ -28,8 +28,10 @@
 window {
     transparency:     "real";
     background-color: @bg;
-    border:           2px;
-    border-color:     @blood;
+    /* Bold red frame. rofi can't animate/glow a border, so this is a vivid,
+       slightly thick solid frame with soft corners for a framed, premium look. */
+    border:           3px;
+    border-color:     #ff3b3b;
     border-radius:    16px;
     width:            560px;   /* compact, as before */
     padding:          0px;
